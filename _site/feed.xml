@@ -15,23 +15,23 @@
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/ShengleiH/machine_learning/blob/master/naiveNN.py&quot;&gt;3层全连接网络完整代码&lt;/a&gt;&lt;/p&gt;
 
-&lt;h4 id=&quot;section&quot;&gt;神经网络的搭建&lt;/h4&gt;
+&lt;h4&gt;神经网络的搭建&lt;/h4&gt;
 
-&lt;h6 id=&quot;tensorflow&quot;&gt;导入tensorflow包：&lt;/h6&gt;
+&lt;h6&gt;导入tensorflow包：&lt;/h6&gt;
 &lt;p&gt;这要是不导入怎么用啊？！&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import tensorflow as tf
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6 id=&quot;mnist&quot;&gt;加载MNIST数据&lt;/h6&gt;
+&lt;h6&gt;加载MNIST数据&lt;/h6&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6 id=&quot;section-1&quot;&gt;搭建空的网络框架&lt;/h6&gt;
+&lt;h6&gt;搭建空的网络框架&lt;/h6&gt;
 
 &lt;p&gt;&lt;strong&gt;1. 定义好将来存放数据x和标签y的占位符placeholder&lt;/strong&gt;&lt;/p&gt;
 
@@ -83,7 +83,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6 id=&quot;section-2&quot;&gt;训练模型&lt;/h6&gt;
+&lt;h6&gt;训练模型&lt;/h6&gt;
 
 &lt;p&gt;&lt;strong&gt;1. 开启事务session，初始化刚才定义的变量&lt;/strong&gt;&lt;/p&gt;
 
@@ -100,13 +100,13 @@ session.run(tf.initialize_all_variables())
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6 id=&quot;section-3&quot;&gt;测试模型&lt;/h6&gt;
+&lt;h6&gt;测试模型&lt;/h6&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;print(accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h4 id=&quot;section-4&quot;&gt;我遇到的问题（解决了）&lt;/h4&gt;
+&lt;h4&gt;我遇到的问题（解决了）&lt;/h4&gt;
 
 &lt;p&gt;我发现的一个问题。&lt;/p&gt;
 
