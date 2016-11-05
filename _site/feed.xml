@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Shenglei's Sketches</title>
-    <description></description>
+    <title>Shenglei Sketches</title>
+    <description>在机器学习的路上，装逼女青年 | I am learning machine learning | 最喜欢在咖啡店自习</description>
     <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 05 Nov 2016 19:17:00 +0800</pubDate>
-    <lastBuildDate>Sat, 05 Nov 2016 19:17:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Sat, 05 Nov 2016 21:01:55 +0800</pubDate>
+    <lastBuildDate>Sat, 05 Nov 2016 21:01:55 +0800</lastBuildDate>
     <generator>Jekyll v3.3.0</generator>
     
       <item>
@@ -139,8 +139,8 @@ W1 = init_weights([784, 100])
 &lt;p&gt;然后我就试了一下tf.argmax(y_, 2)，报错了！！！说“这个维度的取值在[0,2)”，于是，我明白了！TensorFlow中维度是从0开始算的！！！&lt;strong&gt;很好，这相当程序员！！！&lt;/strong&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 05 Nov 2016 17:49:45 +0800</pubDate>
-        <link>http://localhost:4000/maching-learning-tensorflow-1</link>
-        <guid isPermaLink="true">http://localhost:4000/maching-learning-tensorflow-1</guid>
+        <link>http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/</guid>
         
         
         <category>jekyll</category>
