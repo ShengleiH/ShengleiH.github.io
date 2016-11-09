@@ -1,137 +1,96 @@
 ---
 layout: post
-title:  "使用TensorFlow搭建最简单的全连接神经网络"
-date:   2016-11-05 11:49:45 +0200
+title:  "使用TensorFlow搭建结构化的全连接神经网络"
+date:   2016-11-09 22:15:50 +0200
 categories: jekyll update
 ---
 
-前几天看了TensorFlow，今天把之前写的“三层全连接神经网络”重新写了一遍，然后发现了一个问题，最后自己解决啦～  
+上一篇中的全连接神经网络上是不具有代码重用性的，这样零散的结构不太符合object-oriented规范。今天照着tutorial里给的代码重写了一遍，理解了其中的一些，还有一些依旧难以理解，可能是对python语法也不太熟悉的缘故。
 
-[3层全连接网络完整代码][]
+先把自己理解了的写下来，即使花费宝贵的半小时睡眠时间也得写下来，今日事今日毕！
 
-[3层全连接网络完整代码]: https://github.com/ShengleiH/machine_learning/blob/master/naiveNN.py
+[封装的全连接网络完整代码][]
+
+[封装的全连接网络完整代码]: https://github.com/ShengleiH/machine_learning/tree/master/tensorflow/tutorials/encapsulatedFNN
 
 
-#### 神经网络的搭建
+#### 神经网络框架搭建
 
-###### 导入tensorflow包：
-这要是不导入怎么用啊？！
+这一步在naiveFNN.py中完成，这里面没有任何数据，所有的数据都在fully_connected_feed.py中填充，而naiveFNN.py单纯地构建一个**框架**
 
-```
-import tensorflow as tf
-```
+> 首先强调一点：TensorFlow中，图片的所有输入和输出shape都是[batch\_size, NUM\_nuerons]；输入[55000, 784]，输出[55000, 10]
 
-###### 加载MNIST数据
+###### inference 推理函数--用来构建出网络雏形（在tensorflow中把这个网络结构称为graph，图）：
 
-```
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-```
-
-###### 搭建空的网络框架
-
-**1. 定义好将来存放数据x和标签y的占位符placeholder**
+这里我们构建一个4层的神经网络，输入层[784个nuerons]、隐藏层1（hidden1）、隐藏层2（hidden2）和输出层（softmax_linear）
 
 ```
-x = tf.placeholder(tf.float32, shape=[None, 784])
-y_ = tf.placeholder(tf.float32, shape=[None, 10])
+def weights_varialble(shape, input_units):
+    initial = tf.truncated_normal(shape, stddev=1.0/math.sqrt(float(input_units)))
+    return tf.Variable(initial, name='weights')
+
+
+def biases_variable(shape):
+    initial = tf.zeros(shape)
+    return tf.Variable(initial, name='biases')
+    
+    
+def inference(images, hidden1_units, hidden2_units):
+    with tf.name_scope('hidden1'):
+        weights = weights_varialble([IMAGE_PIXELS, hidden1_units], IMAGE_PIXELS)
+        biases = biases_variable([hidden1_units])
+        hidden1 = tf.nn.relu(tf.matmul(images, weights) + biases)
+
+    with tf.name_scope('hidden2'):
+        weights = weights_varialble([hidden1_units, hidden2_units], hidden1_units)
+        biases = biases_variable([hidden2_units])
+        hidden2 = tf.nn.relu(tf.matmul(hidden1, weights) + biases)
+
+    with tf.name_scope('softmax_linear'):
+        weights = weights_varialble([hidden2_units, NUM_CLASSES], hidden2_units)
+        biases = biases_variable([NUM_CLASSES])
+        logits = tf.matmul(hidden2, weights) + biases
+
+    return logits
 ```
 
-**2. 定义好用来初始化weights和bias的函数，然后定义好变量W和b**
+**来看下这个函数的参数（args）：**
+
+images：输入的图片集--训练集、测试集......形状（shape）为[batch\_size, IMAGE\_PIXELS]，如[50, 784]
+
+hidden1\_units, hidden2\_units：这两层的neuron数量
+
+**我的额外理解：**
+
+1. with tf.name_scope('hidden1')：就是在名为hidden1的范围下定义了下面的这些东西：weights、biases和hidden1，所有的这些东西都是属于hidden1的。
+2. 这里weights和biases的初始化的函数不一定是这样的，如biases的初始化还可以用上一篇中的：```tf.constant(0.1, shape=shape)```
+3. 还需要注意的，tensorflow中，matmul函数中参数的顺序，理论学习中我们知道应该是```y = Wx + b```，而这里matmul中的顺序是相反的--```matmul(x, W)```。其实我发现，tensorflow中矩阵的行列和理论学习中的都是相反的......
+4. 这里输出层softmax\_linear没有使用调用softmax函数，是因为tensorflow中有这样的函数可以一边对数据apply softmax，一边进行计算交叉熵cross_entropy（简写xentropy），我们在下一步的loss函数中会用到的--sparse\_softmax\_cross\_entropy\_with\_logits(...)
+
+**我的问题**
+
+name_scope中定义的变量可以在这个范围之外被读取到吗？如果说不能，那么上面代码中，```return logits```是怎么来的？如果说能，那么上面代码中，hidden1和hidden2中都有weights和biases这可怎么区分啊？？？
+
+###### loss 损失函数--用来向雏形图中添加“损失操作”
 
 ```
-def init_weights(shape):
-    initial = tf.truncated_normal(shape, stddev=0.1)
-    return tf.Variable(initial)
-
-def init_bias(shape):
-    initial = tf.constant(0.1, shape=shape)
-    return tf.Variable(initial)
-
-W1 = init_weights([784, 100])
-b1 = init_bias([100])
-W2 = init_weights([100, 10])
-b2 = init_bias([10])
+def loss(logits, labels):
+    labels = tf.to_int64(labels)
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, labels, name='xentropy')
+    loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
+    return loss
 ```
 
-**3. 前向传播**
-
-使用relu函数作为激活函数，使用softmax作为分类器。
-
-```
-y1 = tf.nn.relu(tf.matmul(x, W1) + b1)
-y2 = tf.nn.softmax(tf.matmul(y1, W2) + b2)
-```
-
-**4. 反向传播**
-
-tensorflow已经封装好了back propagation。
-由于分类器使用了softmax，所以这里的代价函数是**交叉熵（cross-entropy）**
-
-```
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y2), reduction_indices=[1]))
-train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
-```
-
-**5. 模型评估**
-
-```
-correct_prediction = tf.equal(tf.argmax(y2,1), tf.argmax(y_,1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-```
-
-###### 训练模型
-
-**1. 开启事务session，初始化刚才定义的变量**
-
-```
-session = tf.InteractiveSession()
-session.run(tf.initialize_all_variables())
-```
-
-**2. 赋值训练**
-
-```
-for i in range(1000):
-    batch = mnist.train.next_batch(100)
-    train_step.run(feed_dict={x: batch[0], y_: batch[1]})
-```
-
-###### 测试模型
-
-```
-print(accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-```
-
-#### 我遇到的问题（解决了）
-
-我发现的一个问题。
-
-每次在学习神经网络的时候，最搞不清楚的就是矩阵的维度，到底是nm？还是mn？这次在TensorFlow的代码中，也着实让我混乱了一把，因为它和我们理论学习中矩阵的维度是相反的！！！
-
-在这里我们搭建了一个3层的全连接神经网络：第一层输入层有784个nueron（即一张图片为28*28像素的）；第二层隐藏层有100个nueron（自己设置的，无所谓吧，应该）；第三层输出层有10个neuron（即标签的数量0--9，10个数字）
-
-于是在理论学习中，从输入层到隐藏层，我们会把**输入图像矩阵**设置为**784乘m**；**权重矩阵**设置成**100乘784**。
-
-然而我们可以在代码中看到，TensorFlow是这样设置的：
-
-```
-x = tf.placeholder(tf.float32, shape=[None, 784])
-y_ = tf.placeholder(tf.float32, shape=[None, 10])
-W1 = init_weights([784, 100])
-```
-
-也就是说，TensorFlow中把**输入图像矩阵**设置为**m乘784**；**权重矩阵**设置成**784乘100**,明显的，它的维度和我们理论学习中的是**相反的**！！！
+----
+明天继续更......
 
 
-那么我们在看**模型评估**这里：
 
-```
-correct_prediction = tf.equal(tf.argmax(y2,1), tf.argmax(y_,1))
-```
 
-argmax函数是把指定维度中最大的那一个的index返回。
 
-前面代码中定义的placeholders中y\_的shape是[None, 10]，也就是说y\_的第一维度在TensorFlow中表示数据的index，第二维度才是计算出来的10个label的值呀。而在模型评估中，用了tf.argmax(y\_, 1)，就是说对y_的第一维度取最大值？！这不就错了？不应该使用第二维度吗？即tf.argmax(y\_, 2)？
 
-然后我就试了一下tf.argmax(y\_, 2)，报错了！！！说“这个维度的取值在[0,2)”，于是，我明白了！TensorFlow中维度是从0开始算的！！！**很好，这相当程序员！！！**
+
+
+
+
+
