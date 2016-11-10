@@ -2,7 +2,7 @@
 layout: post
 title:  "结构化的全连接神经网络FNN框架搭建（TensorFlow）"
 date:   2016-11-09 22:15:50 +0200
-categories: jekyll update
+categories: machine_learning posts
 ---
 
 上一篇中的全连接神经网络上是不具有代码重用性的，这样零散的结构不太符合object-oriented规范。今天照着tutorial里给的代码重写了一遍，理解了其中的一些，还有一些依旧难以理解，可能是对python语法也不太熟悉的缘故。
