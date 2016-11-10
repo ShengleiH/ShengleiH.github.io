@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "结构化的全连接神经网络FNN框架搭建（TensorFlow）"
+title:  "结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）"
 date:   2016-11-09 22:15:50 +0200
 categories: machine_learning posts
 ---
@@ -236,7 +236,9 @@ tf.reduce\_sum(x, -2) = tf.reduce\_sum(x, 1)
 > 下一篇中我们将填充数据，也就是官网代码中的fully_connected_feed.py中的代码
 
 
+参考资料：[TensorFlow官方tutorial-mechanics-101][]
 
+[TensorFlow官方tutorial-mechanics-101]: https://www.tensorflow.org/versions/r0.11/tutorials/mnist/tf/index.html#tensorflow-mechanics-101
 
 
 
