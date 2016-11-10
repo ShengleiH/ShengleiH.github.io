@@ -2,7 +2,7 @@
 layout: post
 title:  "使用TensorFlow搭建最简单的全连接神经网络"
 date:   2016-11-05 11:49:45 +0200
-categories: jekyll update
+categories: machine_learning posts
 ---
 
 前几天看了TensorFlow，今天把之前写的“三层全连接神经网络”重新写了一遍，然后发现了一个问题，最后自己解决啦～  
