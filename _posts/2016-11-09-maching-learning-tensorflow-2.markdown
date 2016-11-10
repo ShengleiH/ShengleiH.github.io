@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "使用TensorFlow搭建结构化的全连接神经网络"
+title:  "结构化的全连接神经网络FNN框架搭建（TensorFlow）"
 date:   2016-11-09 22:15:50 +0200
 categories: jekyll update
 ---
