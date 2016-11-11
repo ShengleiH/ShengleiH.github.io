@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/">
+    <link rel="canonical" href="http://localhost:4000/machine_learning/posts/2016/11/05/maching-learning-tensorflow-1/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -77,8 +77,9 @@
             <div class="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="/">Home</a>
+                        <a href="">Home</a>
                     </li>
+                    
                 </ul>
             </div>
         </div>
@@ -187,7 +188,7 @@
 
 				<p>前几天看了TensorFlow，今天把之前写的“三层全连接神经网络”重新写了一遍，然后发现了一个问题，最后自己解决啦～</p>
 
-<p><a href="https://github.com/ShengleiH/machine_learning/blob/master/naiveNN.py">3层全连接网络完整代码</a></p>
+<p><a href="https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/naiveNN.py">3层全连接网络完整代码</a></p>
 
 <h4 id="section">神经网络的搭建</h4>
 
@@ -315,134 +316,67 @@ W1 = init_weights([784, 100])
 
                 <hr style="visibility: hidden;">
 
-                
                 <!-- 多说 Share start -->
-                <div class="ds-share"
-                    style="text-align: right"
-                    data-thread-key="/jekyll/update/2016/11/05/maching-learning-tensorflow-1"
-                    data-title="使用TensorFlow搭建最简单的全连接神经网络"
-                    data-url="http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/"
-                    data-images="http://localhost:4000/img/home-bg.jpg"
-                    data-content="前几天看了TensorFlow，今天把之前写的“三层全连接神经网络”重新写了一遍，然后发现了一个问题，最后自己解决啦～
-
-3层全连接网络完整代码
-
-神经网... | Shenglei | Sketches " >
-                    <div class="ds-share-inline">
-                      <style> 
-                        .ds-share-icons-16 {display:none;} 
-                      </style>
-                      <ul class="ds-share-icons-16">
-                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
-                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
-                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
-                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
-                      </ul>
-                      <div class="ds-share-icons-more">
-                      </div>
-                    </div>
-                <hr>
-                </div>
+               <!--   -->
                 <!-- 多说 Share end-->
-                
-
-
                 <ul class="pager">
                     
                     
+                    <li class="next">
+                        <a href="/machine_learning/posts/2016/11/10/maching-learning-tensorflow-2/" data-toggle="tooltip" data-placement="top" title="结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）">
+                        Next<br>
+                        <span>结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）</span>
+                        </a>
+                    </li>
+                    
                 </ul>
 
-
-                
                 <!-- 多说评论框 start -->
-                <div class="comment">
-                    <div class="ds-thread"
-                        data-thread-key="/jekyll/update/2016/11/05/maching-learning-tensorflow-1"
-                        data-title="使用TensorFlow搭建最简单的全连接神经网络"
-                        data-url="http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/" >
-                    </div>
-                </div>
+                <div class="ds-thread" data-thread-key="/machine_learning/posts/2016/11/05/maching-learning-tensorflow-1" data-title="使用TensorFlow搭建最简单的全连接神经网络" data-url="http://localhost:4000/machine_learning/posts/2016/11/05/maching-learning-tensorflow-1/"></div>
                 <!-- 多说评论框 end -->
-                
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"shengleih"};
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
 
-                
+                <!--Disque Comments-->
+                <!-- <div id="disqus_thread"></div>
+                <script>
+                    /**
+                    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+                    /*
+                    var disqus_config = function () {
+                    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+                    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                    };
+                    */
+                    (function() { // DON'T EDIT BELOW THIS LINE
+                        var d = document, s = d.createElement('script');
+                        s.src = '//shenglei.disqus.com/embed.js';
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript> -->
+                <!--Disque Ends-->
 
             </div>  
-
-    <!-- Side Catalog Container -->
-        
-
-    <!-- Sidebar Container -->
-            <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                sidebar-container">
-
-                <!-- Featured Tags -->
-                
-                <section>
-                    <hr class="hidden-sm hidden-xs">
-                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-                    <div class="tags">
-        				
-        			</div>
-                </section>
-                
-
-                <!-- Friends Blog -->
-                
-                <hr>
-                <h5>FRIENDS</h5>
-                <ul class="list-inline">
-                    
-                        <li><a href="http://su.gallery/">Su</a></li>
-                    
-                        <li><a href="http://mida.re/">乱序</a></li>
-                    
-                        <li><a href="http://qianduan.guru/">前端外刊评论</a></li>
-                    
-                        <li><a href="http://lingyu.wang/">天镶的博客</a></li>
-                    
-                        <li><a href="http://hmqk1995.github.io">Luke 的自留地</a></li>
-                    
-                        <li><a href="http://ebnbin.com/">Ebn's Blog</a></li>
-                    
-                        <li><a href="http://blog.smdcn.net">SmdCn's Blog</a></li>
-                    
-                        <li><a href="http://xieminis.me/">解旻的博客</a></li>
-                    
-                        <li><a href="http://dhong.co">DHong Say</a></li>
-                    
-                        <li><a href="http://ingf.github.io/">尹峰以为</a></li>
-                    
-                        <li><a href="http://wepiaofei.github.io/blog/">前端神盾局</a></li>
-                    
-                </ul>
-                
-            </div>
+       
         </div>
     </div>
 </article>
 
 
-
-<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-<script type="text/javascript">
-    // dynamic User by Hux
-    var _user = 'ShengleiSketches';
-
-    // duoshuo comment query.
-    var duoshuoQuery = {short_name: _user };
-    (function() {
-        var ds = document.createElement('script');
-        ds.type = 'text/javascript';ds.async = true;
-        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-        ds.charset = 'UTF-8';
-        (document.getElementsByTagName('head')[0]
-         || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-</script>
-<!-- 多说公共JS代码 end -->
 
 
 
@@ -497,7 +431,7 @@ W1 = init_weights([784, 100])
                     <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
                     
                     <li>
-                        <a target="_blank" href="https://www.zhihu.com/people/Kelseyh">
+                        <a target="_blank" href="https://www.zhihu.com/people/kelseyh">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa  fa-stack-1x fa-inverse">知</i>
@@ -519,7 +453,7 @@ W1 = init_weights([784, 100])
 
                     
                     <li>
-                        <a target="_blank" href="https://www.facebook.com/KelseyHuang">
+                        <a target="_blank" href="https://www.facebook.com/shengleihuang">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>

@@ -5,33 +5,424 @@
     <description>在机器学习的路上，装逼女青年 | I am learning machine learning | 最喜欢在咖啡店自习</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 05 Nov 2016 21:01:55 +0800</pubDate>
-    <lastBuildDate>Sat, 05 Nov 2016 21:01:55 +0800</lastBuildDate>
+    <pubDate>Fri, 11 Nov 2016 16:22:02 +0800</pubDate>
+    <lastBuildDate>Fri, 11 Nov 2016 16:22:02 +0800</lastBuildDate>
     <generator>Jekyll v3.3.0</generator>
+    
+      <item>
+        <title>结构化的全连接神经网络FNN框架--part2使用（TensorFlow）</title>
+        <description>&lt;p&gt;这一篇中我们将使用前面搭建的FNN网络来训练MNIST数据集&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/fully_connected_feed.py&quot;&gt;使用FNN代码&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;####几个包的导入&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from __future__ import division
+
+import os.path
+import time
+
+import tensorflow as tf
+
+from tensorflow.examples.tutorials.mnist import input_data
+import naiveFNN
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;from __future__ import division：为了使用’//’，整除，结果为不大于真是结果的整数。如果不引入这个包，就会默认为’/’就是除法。&lt;/p&gt;
+
+&lt;p&gt;import os.path：为了使用&lt;code class=&quot;highlighter-rouge&quot;&gt;checkpoint_file = os.path.join(FLAGS.train_dir, 'checkpoint')&lt;/code&gt;这是用来记录每一步的日志，和网络本身没啥关系。&lt;/p&gt;
+
+&lt;p&gt;import time：为了使用&lt;code class=&quot;highlighter-rouge&quot;&gt;start_time = time.time()&lt;/code&gt;这是用来获取迭代时间的，和网络本身没有关系&lt;/p&gt;
+
+&lt;p&gt;import tensorflow as tf：为了使用tensorflow中的方法&lt;/p&gt;
+
+&lt;p&gt;from tensorflow.examples.tutorials.mnist import input_data：从官网github上下载实验所需数据集，如果自行下载了，和代码放在同一目录下，然后直接import input_data就好了。&lt;/p&gt;
+
+&lt;p&gt;import naiveFNN：使用FNN网络框架。这里要注意，如果要运行代码，请务必将naiveFNN.py下载，并且和这个代码放在同一目录下。&lt;/p&gt;
+
+&lt;p&gt;####网络各层参数定义&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;flags = tf.app.flags
+flags.DEFINE_float('learning_rate', 0.1, 'Initial learning rate.')
+flags.DEFINE_integer('max_steps', 2000, 'Number of steps to run trainer.')
+flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')
+flags.DEFINE_integer('hidden2', 32, 'Number of units in hidden layer 2.')
+flags.DEFINE_integer('batch_size', 100, 'Batch size. Must divide evenly into the dataset sizes.')
+flags.DEFINE_string('train_dir', 'data', 'Directory to put the training data.')
+flags.DEFINE_boolean('fake_data', False, 'If true, uses fake data for unit testing.')
+FLAGS = flags.FLAGS
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这里的FLAGS，我的理解就是和java中的枚举类似，之后调用的时候就直接&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAGS.balabala&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我的额外理解&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;一开始我感觉很奇怪，为什么train_dir的值会是data，前面的实验中我们都使用的是MNIST_data，难道这可以随便设吗？&lt;/p&gt;
+
+&lt;p&gt;后来我去翻了下Dataset.read_data_sets(…)方法的源代码（已经在你电脑中的python下面了哦）:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+  local_file = base.maybe_download(TRAIN_IMAGES, train_dir,
+                                   SOURCE_URL + TRAIN_IMAGES)
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;继续去base.maybe_download(…)源代码查看：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def maybe_download(filename, work_directory, source_url):
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;可见，这只是一个work directory，也就是在本地，你要把下载下来的数据存放的地方，如果这个directory不存在，就创建一个，如果存在，就放在这个下面。真正决定从哪里下载的是source_url。filename也只是这些数据集在本地的命名。&lt;/p&gt;
+
+&lt;p&gt;####在run_training函数中给框架填充数据&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;logits = naiveFNN.inference(images_placeholder, FLAGS.hidden1, FLAGS.hidden2)
+loss = naiveFNN.loss(logits, labels_placeholder)
+train_op = naiveFNN.training(loss, FLAGS.learning_rate)
+eval_correct = naiveFNN.evaluation(logits, labels_placeholder)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;####在run_training函数中训练网络&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;for step in xrange(FLAGS.max_steps):
+    feed_dict = fill_feed_dict(data_sets.train, images_placeholder, labels_placeholder)
+    _, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;迭代FLAGS.max_steps次，每次去batch_size个数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我的额外理解&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;fill_feed_dict：自定义的一个用来向placehoder中填充数据的函数，从data_sets.train中取出数据，填充到images_placeholder, labels_placeholder中，然后返回一个包含了这两个placeholders的dictionary。&lt;/p&gt;
+
+&lt;p&gt;sess.run([train_op, loss], feed_dict=feed_dict)：写成&lt;code class=&quot;highlighter-rouge&quot;&gt;sess.run([train_op, loss], feed_dict)&lt;/code&gt;也可以的，有没有&lt;code class=&quot;highlighter-rouge&quot;&gt;feed_dict=&lt;/code&gt;这个无所谓。这个函数是前面第一个参数是什么，它就返回什么，比如说，第一个参数是[train_op, loss]，那么就会返回[train_op, loss]，然后因为train_op的值我们不需要，所以就用’_‘来忽略，loss的结果就用loss_value来接收。&lt;/p&gt;
+
+&lt;p&gt;xrange：作用和range是一样的，但是在大数据集时，xrange的性能更好。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;range(5)
+[0, 1, 2, 3, 4]
+
+xrange(5)
+list(xrange(5))
+[0, 1, 2, 3, 4]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;最后整理一下run_training的整个步骤&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;从train set中取batch_size个数据并填充到网络中&lt;/li&gt;
+  &lt;li&gt;运行网络，获取网络的loss值&lt;/li&gt;
+  &lt;li&gt;继续步骤1、2，直到循环“max_steps”次（只是网络的累积调整过程，每一次都是在上一次的基础上进行的）&lt;/li&gt;
+  &lt;li&gt;每100次循环输出一个loss value看看&lt;/li&gt;
+  &lt;li&gt;每999次循环以及&lt;strong&gt;最后一次循环&lt;/strong&gt;，对当前网络进行一个测评：
+    &lt;ol&gt;
+      &lt;li&gt;从train／validation／test数据集中取batch_size个数据&lt;/li&gt;
+      &lt;li&gt;运行测评网络（naiveFNN.evaluation()那个函数），获取这batch_size个数据中正确的个数&lt;/li&gt;
+      &lt;li&gt;继续步骤1、2，直到循环“数据集总个数//batch_size”次（这里‘//’是一个整除）。循环的目的是为了尽可能地用尽数据集中的数据。&lt;/li&gt;
+      &lt;li&gt;最后获取到train／validation／test数据集中判断正确的个数&lt;/li&gt;
+      &lt;li&gt;计算得到准确率&lt;code class=&quot;highlighter-rouge&quot;&gt;precision = true_count / num_examples&lt;/code&gt;。由于整除这里的num_examples可能比实际的少&lt;code class=&quot;highlighter-rouge&quot;&gt;num_examples = real_num_examples // batch_size * FLAGS.batch_size&lt;/code&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;于是在&lt;strong&gt;最后一次循环&lt;/strong&gt;后，我们获取到了一个准确率precision&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;OK，以上就是用TensorFlow搭建封装的神经网络的解析。很多API还是没有理解好，不过不急，慢慢地用多了就有感觉了，就会知道了。&lt;/p&gt;
+
+&lt;p&gt;参考资料：&lt;a href=&quot;https://www.tensorflow.org/versions/r0.11/tutorials/mnist/tf/index.html#tensorflow-mechanics-101&quot;&gt;TensorFlow官方tutorial-mechanics-101&lt;/a&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 10 Nov 2016 20:10:49 +0800</pubDate>
+        <link>http://localhost:4000/machine_learning/posts/2016/11/10/maching-learning-tensorflow-3/</link>
+        <guid isPermaLink="true">http://localhost:4000/machine_learning/posts/2016/11/10/maching-learning-tensorflow-3/</guid>
+        
+        
+        <category>machine_learning</category>
+        
+        <category>posts</category>
+        
+      </item>
+    
+      <item>
+        <title>结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）</title>
+        <description>&lt;p&gt;上一篇中的全连接神经网络上是不具有代码重用性的，这样零散的结构不太符合object-oriented规范。今天照着tutorial里给的代码重写了一遍，理解了其中的一些，还有一些依旧难以理解，可能是对python语法也不太熟悉的缘故。&lt;/p&gt;
+
+&lt;p&gt;先把自己理解了的写下来，即使花费宝贵的半小时睡眠时间也得写下来，今日事今日毕！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/naiveFNN.py&quot;&gt;网络框架完整代码&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;神经网络框架的搭建在naiveFNN.py中完成，这里面没有任何数据，相当于定义了一个巨型函数，所有的数据都在后续使用中填充，而naiveFNN.py单纯地构建一个&lt;strong&gt;框架&lt;/strong&gt;（或称为函数）&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;首先强调一点：TensorFlow中，图片的所有输入和输出shape都是[batch_size, NUM_nuerons]；输入[55000, 784]，输出[55000, 10]&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;inference---tensorflowgraph&quot;&gt;inference 推理函数–用来构建出网络雏形（在tensorflow中把这个网络结构称为graph，图）：&lt;/h4&gt;
+
+&lt;p&gt;这里我们构建一个4层的神经网络，输入层[784个nuerons]、隐藏层1（hidden1）、隐藏层2（hidden2）和输出层（softmax_linear）&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def weights_varialble(shape, input_units):
+    initial = tf.truncated_normal(shape, stddev=1.0/math.sqrt(float(input_units)))
+    return tf.Variable(initial, name='weights')
+
+
+def biases_variable(shape):
+    initial = tf.zeros(shape)
+    return tf.Variable(initial, name='biases')
+    
+    
+def inference(images, hidden1_units, hidden2_units):
+    with tf.name_scope('hidden1'):
+        weights = weights_varialble([IMAGE_PIXELS, hidden1_units], IMAGE_PIXELS)
+        biases = biases_variable([hidden1_units])
+        hidden1 = tf.nn.relu(tf.matmul(images, weights) + biases)
+
+    with tf.name_scope('hidden2'):
+        weights = weights_varialble([hidden1_units, hidden2_units], hidden1_units)
+        biases = biases_variable([hidden2_units])
+        hidden2 = tf.nn.relu(tf.matmul(hidden1, weights) + biases)
+
+    with tf.name_scope('softmax_linear'):
+        weights = weights_varialble([hidden2_units, NUM_CLASSES], hidden2_units)
+        biases = biases_variable([NUM_CLASSES])
+        logits = tf.matmul(hidden2, weights) + biases
+
+    return logits
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;来看下这个函数的参数（args）：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;images：输入的图片集–训练集、测试集……形状（shape）为[batch_size, IMAGE_PIXELS]，如[50, 784]&lt;/p&gt;
+
+&lt;p&gt;hidden1_units, hidden2_units：这两层的neuron数量&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我的额外理解：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;with tf.name_scope(‘hidden1’)：就是在名为hidden1的范围下定义了下面的这些东西：weights、biases和hidden1，所有的这些东西都是属于hidden1的。&lt;/li&gt;
+  &lt;li&gt;这里weights和biases的初始化的函数不一定是这样的，如biases的初始化还可以用上一篇中的：&lt;code class=&quot;highlighter-rouge&quot;&gt;tf.constant(0.1, shape=shape)&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;还需要注意的，tensorflow中，matmul函数中参数的顺序，理论学习中我们知道应该是&lt;code class=&quot;highlighter-rouge&quot;&gt;y = Wx + b&lt;/code&gt;，而这里matmul中的顺序是相反的–&lt;code class=&quot;highlighter-rouge&quot;&gt;matmul(x, W)&lt;/code&gt;。其实我发现，tensorflow中矩阵的行列和理论学习中的都是相反的……&lt;/li&gt;
+  &lt;li&gt;这里输出层softmax_linear没有使用调用softmax函数，是因为tensorflow中有这样的函数可以一边对数据apply softmax，一边进行计算交叉熵cross_entropy（简写xentropy），我们在下一步的loss函数中会用到的–sparse_softmax_cross_entropy_with_logits(…)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;我的问题&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;name_scope中定义的变量可以在这个范围之外被读取到吗？如果说不能，那么上面代码中，&lt;code class=&quot;highlighter-rouge&quot;&gt;return logits&lt;/code&gt;是怎么来的？如果说能，那么上面代码中，hidden1和hidden2中都有weights和biases这可怎么区分啊？？？&lt;/p&gt;
+
+&lt;h4 id=&quot;loss---&quot;&gt;loss 损失函数–用来向雏形图中添加“损失操作”&lt;/h4&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def loss(logits, labels):
+    labels = tf.to_int64(labels)
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, labels, name='xentropy')
+    loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
+    return loss
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;来看下这个函数的参数（args）：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;logits：是我们在inference中构建好的网络雏形，或者说也是网络最后输出层的结果。我觉得这两种理解都行，更偏向于第一种理解，个人感觉这个和matlab中CNN搭建时候很像–建立一个雏形网络，要向里面加东西的时候，就把这个雏形网络作为参数传进去。&lt;/p&gt;
+
+&lt;p&gt;labels：图片数据集的标签集，&lt;code class=&quot;highlighter-rouge&quot;&gt;shape = [batch_size, NUM_CLASSES]&lt;/code&gt;。官网上说，这个集合必须是one-hot value，也就是说，如果这张图片中的数字是3，那么它的标签就得是[0, 0, 0, 1, 0, 0, 0, 0, 0, 0]。这里把labels传进来肯定是非常必要的，因为你要根据这个正确的labels来判断你的网络好不好，然后back propagation来调整你的weights和biases呀！&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我的额外理解：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;loss = tf.reduce_mean(...)&lt;/code&gt;，其实直接&lt;code class=&quot;highlighter-rouge&quot;&gt;loss = cross_entropy&lt;/code&gt;也是没有啥关系的。只不过后面的learning rate调整得小一些就行啦，为什么呢？我是这样理解的：learning rate是每次梯度下降的步长，&lt;strong&gt;learning rate越小&lt;/strong&gt;，梯度下降越慢，是一点儿一点，不敢懈怠地在下降，生动地说，就是&lt;strong&gt;学习得相当仔细&lt;/strong&gt;。而我们的终极目标就是要减小loss到一个范围内，如果取均值，那么loss一开始就比较小了，于是learning rate可以相对大一些，也就是说学习得稍微粗略一些，也能在规定的时间（即迭代次数）内把loss减小到范围内；如果不取均值，那么loss一开始是比较大的，如果要在规定时间（即迭代次数）内把loss下降到一定的范围内，就要学习得仔细一点儿，即让learning rate相对小一些。个人理解，应该不太准确。&lt;/li&gt;
+  &lt;li&gt;这里用了&lt;code class=&quot;highlighter-rouge&quot;&gt;tf.nn.sparse_softmax_cross_entropy_with_logits(...)&lt;/code&gt;，用其他的也是可以的，比如说上一篇中用的&lt;code class=&quot;highlighter-rouge&quot;&gt;tf.nn.softmax_cross_entropy_with_logits(...)&lt;/code&gt;。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;我的问题&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;我看了半天也没有看出来官网给的代码中的labels怎么就突然成了one-hot value了，因为它的代码中并没有如下转换代码，而且数据本身也不是one-hot value啊。&lt;/p&gt;
+
+&lt;p&gt;tutorials里面给了这段代码，可以让labels都变成one-hot value：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;batch_size = tf.size(labels)
+labels = tf.expand_dims(labels, 1)
+indices = tf.expand_dims(tf.range(0, batch_size, 1), 1)
+concated = tf.concat(1, [indices, labels])
+onehot_labels = tf.sparse_to_dense(concated, tf.pack([batch_size, NUM_CLASSES]), 1.0, 0.0)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;对tensorflow的tensor还不是很熟悉的我，真的很难想象tensor的dimension，我现在的唯一理解就是，第一维度就是最外层括号内有多少个整体（第二层括号或者数字），第二维度就是第二层括号内有几个整体（第三层括号或者数字），比如说[[],[],[],[]]的第一维度就是4，[[1,2,3],[3,2,1],[1,1,1],[2,2,2]]的第一维度是4，第二维度就是3。&lt;/p&gt;
+
+&lt;p&gt;所以用代码把每一个步骤的结果打印出来。&lt;/p&gt;
+
+&lt;p&gt;首先，假设&lt;code class=&quot;highlighter-rouge&quot;&gt;labels = [0, 3, 4, 1, 9]&lt;/code&gt;，那么转换过程如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import tensorflow as tf
+session = tf.Session()
+
+NUM_CLASSES = 10
+
+labels = [0, 3, 4, 1, 9]
+print(labels)
+#输出结果：[0, 3, 4, 1, 9]
+
+batch_size = tf.size(labels)
+print(session.run(batch_size))
+#输出结果：5
+
+labels = tf.expand_dims(labels, 1)
+print(session.run(labels))
+#输出结果：
+[[0]
+ [3]
+ [4]
+ [1]
+ [9]]
+
+range = tf.range(0, batch_size, 1)
+print(session.run(range))
+#输出结果：[0 1 2 3 4]
+
+indices = tf.expand_dims(range, 1)
+print(session.run(indices))
+#输出结果：
+[[0]
+ [1]
+ [2]
+ [3]
+ [4]]
+
+concated = tf.concat(1, [indices, labels])
+print(session.run(concated))
+#输出结果：
+[[0 0]
+ [1 3]
+ [2 4]
+ [3 1]
+ [4 9]]
+
+pack = tf.pack([batch_size, NUM_CLASSES])
+print(session.run(pack))
+#输出结果：
+[ 5 10]
+
+onehot_labels = tf.sparse_to_dense(concated, pack, 1.0, 0.0)
+print(session.run(onehot_labels))
+#输出结果：
+[[1. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 1. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 1. 0. 0. 0. 0. 0.]
+ [0. 1. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 1.]]
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;training---&quot;&gt;training 训练函数–用来向网络中（图中）添加“梯度下降”操作，故名“训练”&lt;/h4&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def training(loss, learning_rate):
+    tf.scalar_summary(loss.op.name, loss)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    global_step = tf.Variable(0, name='global_step', trainable=False)
+    train_op = optimizer.minimize(loss, global_step=global_step)
+    return train_op
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;来看下这个函数的参数（args）：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;loss：添加了“损失函数”的网络，或者是这个网络的损失值。&lt;/p&gt;
+
+&lt;p&gt;learning_rate：学习率。说了这个函数是用梯度下降来训练网络的，所以学习率是必须的，也是人为规定的，所以作为参数输入。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我的额外理解：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;这里影响网络的是后面三行，第一行不影响，只是为了接下来的可视化做了一个监测。&lt;/li&gt;
+  &lt;li&gt;optimizer.minimize更新了loss网络中的weights和biases，还更新了global_step（当前是第几次梯度下降）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;我的问题&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;看不懂tf.scalar_summary的用法，说是这个可以把每一次的结果都实时地添加，然后就可以用TensorBoard来可视化整个过程了。还没仔细看过。&lt;/p&gt;
+
+&lt;h4 id=&quot;evaluation---inference&quot;&gt;evaluation 评估函数–用来向&lt;strong&gt;inference&lt;/strong&gt;函数构造的雏形网络中（图中）添加“评估函数”&lt;/h4&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def evaluation(logits, labels):
+    correct = tf.nn.in_top_k(logits, labels, 1)
+    return tf.reduce_sum(tf.cast(correct, tf.int32))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;来看下这个函数的参数（args）：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;logits：是我们在inference中构建好的网络雏形，或者说也是网络最后输出层的结果。&lt;/p&gt;
+
+&lt;p&gt;labels：图片数据集的标签集，是one-hot value，&lt;code class=&quot;highlighter-rouge&quot;&gt;shape = [batch_size, NUM_CLASSES]&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我的额外理解：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;tf.nn.in_top_k(predictions, targets, k)&lt;/code&gt;：predictions是&lt;code class=&quot;highlighter-rouge&quot;&gt;type = float32; shape = [batch_size, NUM_CLASSES]&lt;/code&gt;的矩阵，其中的值代表这个图像被判定为该类别的概率，targets是&lt;code class=&quot;highlighter-rouge&quot;&gt;type = int32 or int64; shape = [batch_size]&lt;/code&gt;的向量，其中的值代表这个图像的真实类别index。k表示这个图像的真实类别的值在predictions的概率中排名前k个。如果排到了前k个，则true，否则false。这里由于predictions全是one-hot value的，一个图像在10个类别下只有一个为1.0，其余都为0.0，所以k=1才能够分类（想一下如果k=2的话，概率的前两名就是1.0和0.0，不管这个类别是什么，它的概率肯定是1.0或者0.0的，也就是说，不论类别是啥，都会是对的。）&lt;/li&gt;
+  &lt;li&gt;in_top_k函数的返回值是bool类型的，我们先把它转换成int类型的，也就是非1即0这样的，然后加一下总和，就知道有几个1了，也就是有几个正确的结果了。&lt;/li&gt;
+  &lt;li&gt;redeuce_sum(…)的reduce意味着在这个tensor的第几个维度上操作。比如说，一个矩阵（Tensor’s rank = 2），指定&lt;code class=&quot;highlighter-rouge&quot;&gt;dim = 0&lt;/code&gt;，则在第一维上求和，比如:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;x = [[2, 3, 1], [2, 3, 1]]
+
+tf.reduce\_sum(x, 0)的结果就是：x = [[2, 3, 1]+[2, 3, 1]] = [4, 6, 2]
+ 
+tf.reduce\_sum(x, 1)的结果就是：x = [[2+3+1], [2+3+1]] = [6, 6]
+ 
+tf.reduce\_sum(x, -1) = tf.reduce\_sum(x, 0)
+ 
+tf.reduce\_sum(x, -2) = tf.reduce\_sum(x, 1)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;我的问题&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这个没有啥问题……&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;下一篇中我们将填充数据，也就是官网代码中的fully_connected_feed.py中的代码&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;参考资料：&lt;a href=&quot;https://www.tensorflow.org/versions/r0.11/tutorials/mnist/tf/index.html#tensorflow-mechanics-101&quot;&gt;TensorFlow官方tutorial-mechanics-101&lt;/a&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 10 Nov 2016 04:15:50 +0800</pubDate>
+        <link>http://localhost:4000/machine_learning/posts/2016/11/10/maching-learning-tensorflow-2/</link>
+        <guid isPermaLink="true">http://localhost:4000/machine_learning/posts/2016/11/10/maching-learning-tensorflow-2/</guid>
+        
+        
+        <category>machine_learning</category>
+        
+        <category>posts</category>
+        
+      </item>
     
       <item>
         <title>使用TensorFlow搭建最简单的全连接神经网络</title>
         <description>&lt;p&gt;前几天看了TensorFlow，今天把之前写的“三层全连接神经网络”重新写了一遍，然后发现了一个问题，最后自己解决啦～&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://github.com/ShengleiH/machine_learning/blob/master/naiveNN.py&quot;&gt;3层全连接网络完整代码&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/naiveNN.py&quot;&gt;3层全连接网络完整代码&lt;/a&gt;&lt;/p&gt;
 
-&lt;h4&gt;神经网络的搭建&lt;/h4&gt;
+&lt;h4 id=&quot;section&quot;&gt;神经网络的搭建&lt;/h4&gt;
 
-&lt;h6&gt;导入tensorflow包：&lt;/h6&gt;
+&lt;h6 id=&quot;tensorflow&quot;&gt;导入tensorflow包：&lt;/h6&gt;
 &lt;p&gt;这要是不导入怎么用啊？！&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import tensorflow as tf
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6&gt;加载MNIST数据&lt;/h6&gt;
+&lt;h6 id=&quot;mnist&quot;&gt;加载MNIST数据&lt;/h6&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6&gt;搭建空的网络框架&lt;/h6&gt;
+&lt;h6 id=&quot;section-1&quot;&gt;搭建空的网络框架&lt;/h6&gt;
 
 &lt;p&gt;&lt;strong&gt;1. 定义好将来存放数据x和标签y的占位符placeholder&lt;/strong&gt;&lt;/p&gt;
 
@@ -83,7 +474,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6&gt;训练模型&lt;/h6&gt;
+&lt;h6 id=&quot;section-2&quot;&gt;训练模型&lt;/h6&gt;
 
 &lt;p&gt;&lt;strong&gt;1. 开启事务session，初始化刚才定义的变量&lt;/strong&gt;&lt;/p&gt;
 
@@ -100,13 +491,13 @@ session.run(tf.initialize_all_variables())
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h6&gt;测试模型&lt;/h6&gt;
+&lt;h6 id=&quot;section-3&quot;&gt;测试模型&lt;/h6&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;print(accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h4&gt;我遇到的问题（解决了）&lt;/h4&gt;
+&lt;h4 id=&quot;section-4&quot;&gt;我遇到的问题（解决了）&lt;/h4&gt;
 
 &lt;p&gt;我发现的一个问题。&lt;/p&gt;
 
@@ -139,13 +530,13 @@ W1 = init_weights([784, 100])
 &lt;p&gt;然后我就试了一下tf.argmax(y_, 2)，报错了！！！说“这个维度的取值在[0,2)”，于是，我明白了！TensorFlow中维度是从0开始算的！！！&lt;strong&gt;很好，这相当程序员！！！&lt;/strong&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 05 Nov 2016 17:49:45 +0800</pubDate>
-        <link>http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2016/11/05/maching-learning-tensorflow-1/</guid>
+        <link>http://localhost:4000/machine_learning/posts/2016/11/05/maching-learning-tensorflow-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/machine_learning/posts/2016/11/05/maching-learning-tensorflow-1/</guid>
         
         
-        <category>jekyll</category>
+        <category>machine_learning</category>
         
-        <category>update</category>
+        <category>posts</category>
         
       </item>
     
