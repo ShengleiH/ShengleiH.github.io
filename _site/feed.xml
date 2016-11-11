@@ -5,8 +5,8 @@
     <description>在机器学习的路上，装逼女青年 | I am learning machine learning | 最喜欢在咖啡店自习</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 11 Nov 2016 16:22:02 +0800</pubDate>
-    <lastBuildDate>Fri, 11 Nov 2016 16:22:02 +0800</lastBuildDate>
+    <pubDate>Fri, 11 Nov 2016 16:32:28 +0800</pubDate>
+    <lastBuildDate>Fri, 11 Nov 2016 16:32:28 +0800</lastBuildDate>
     <generator>Jekyll v3.3.0</generator>
     
       <item>
@@ -15,7 +15,9 @@
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/fully_connected_feed.py&quot;&gt;使用FNN代码&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;####几个包的导入&lt;/p&gt;
+&lt;p&gt;这里不进行整篇代码的详细解释，只对其中几个我疑惑的地方进行解释。&lt;/p&gt;
+
+&lt;h4 id=&quot;section&quot;&gt;几个包的导入&lt;/h4&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from __future__ import division
 
@@ -41,7 +43,7 @@ import naiveFNN
 
 &lt;p&gt;import naiveFNN：使用FNN网络框架。这里要注意，如果要运行代码，请务必将naiveFNN.py下载，并且和这个代码放在同一目录下。&lt;/p&gt;
 
-&lt;p&gt;####网络各层参数定义&lt;/p&gt;
+&lt;h4 id=&quot;section-1&quot;&gt;网络各层参数定义&lt;/h4&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;flags = tf.app.flags
 flags.DEFINE_float('learning_rate', 0.1, 'Initial learning rate.')
@@ -63,10 +65,9 @@ FLAGS = flags.FLAGS
 
 &lt;p&gt;后来我去翻了下Dataset.read_data_sets(…)方法的源代码（已经在你电脑中的python下面了哦）:&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
-  local_file = base.maybe_download(TRAIN_IMAGES, train_dir,
-                                   SOURCE_URL + TRAIN_IMAGES)
-&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;local_file = base.maybe_download(TRAIN_IMAGES, train_dir, SOURCE_URL + TRAIN_IMAGES)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;继续去base.maybe_download(…)源代码查看：&lt;/p&gt;
 
@@ -76,7 +77,8 @@ FLAGS = flags.FLAGS
 
 &lt;p&gt;可见，这只是一个work directory，也就是在本地，你要把下载下来的数据存放的地方，如果这个directory不存在，就创建一个，如果存在，就放在这个下面。真正决定从哪里下载的是source_url。filename也只是这些数据集在本地的命名。&lt;/p&gt;
 
-&lt;p&gt;####在run_training函数中给框架填充数据&lt;/p&gt;
+&lt;h4 id=&quot;runtraining&quot;&gt;在run_training函数中给框架填充数据&lt;/h4&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;logits = naiveFNN.inference(images_placeholder, FLAGS.hidden1, FLAGS.hidden2)
 loss = naiveFNN.loss(logits, labels_placeholder)
 train_op = naiveFNN.training(loss, FLAGS.learning_rate)
@@ -84,7 +86,8 @@ eval_correct = naiveFNN.evaluation(logits, labels_placeholder)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;####在run_training函数中训练网络&lt;/p&gt;
+&lt;h4 id=&quot;runtraining-1&quot;&gt;在run_training函数中训练网络&lt;/h4&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;for step in xrange(FLAGS.max_steps):
     feed_dict = fill_feed_dict(data_sets.train, images_placeholder, labels_placeholder)
     _, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)

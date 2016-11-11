@@ -11,7 +11,9 @@ categories: machine_learning posts
 
 [使用FNN代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/fully_connected_feed.py
  
-####几个包的导入
+这里不进行整篇代码的详细解释，只对其中几个我疑惑的地方进行解释。
+
+#### 几个包的导入
 
 ```
 from __future__ import division
@@ -37,7 +39,7 @@ from tensorflow.examples.tutorials.mnist import input_data：从官网github上�
 
 import naiveFNN：使用FNN网络框架。这里要注意，如果要运行代码，请务必将naiveFNN.py下载，并且和这个代码放在同一目录下。
 
-####网络各层参数定义
+#### 网络各层参数定义
 
 ```
 flags = tf.app.flags
@@ -59,10 +61,10 @@ FLAGS = flags.FLAGS
 
 后来我去翻了下Dataset.read_data\_sets(...)方法的源代码（已经在你电脑中的python下面了哦）:
 
- ```
-  local_file = base.maybe_download(TRAIN_IMAGES, train_dir,
-                                   SOURCE_URL + TRAIN_IMAGES)
- ```
+
+```
+local_file = base.maybe_download(TRAIN_IMAGES, train_dir, SOURCE_URL + TRAIN_IMAGES)
+```
  
 继续去base.maybe\_download(...)源代码查看：
 
@@ -72,7 +74,8 @@ def maybe_download(filename, work_directory, source_url):
 
 可见，这只是一个work directory，也就是在本地，你要把下载下来的数据存放的地方，如果这个directory不存在，就创建一个，如果存在，就放在这个下面。真正决定从哪里下载的是source_url。filename也只是这些数据集在本地的命名。
 
-####在run_training函数中给框架填充数据
+#### 在run_training函数中给框架填充数据
+
 ```
 logits = naiveFNN.inference(images_placeholder, FLAGS.hidden1, FLAGS.hidden2)
 loss = naiveFNN.loss(logits, labels_placeholder)
@@ -80,7 +83,8 @@ train_op = naiveFNN.training(loss, FLAGS.learning_rate)
 eval_correct = naiveFNN.evaluation(logits, labels_placeholder)
 ```
 
-####在run_training函数中训练网络
+#### 在run_training函数中训练网络
+
 ```
 for step in xrange(FLAGS.max_steps):
     feed_dict = fill_feed_dict(data_sets.train, images_placeholder, labels_placeholder)
