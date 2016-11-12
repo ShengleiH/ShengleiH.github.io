@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Shenglei, machine learing, cafe, sketches">
     <meta name="theme-color" content="#000000">
     
-    <title>结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow） - Shenglei | Sketches</title>
+    <title>IRIS flowers识别（TensorFlow.contrib.learn） - Shenglei | Sketches</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/machine_learning/posts/2016/11/10/maching-learning-tensorflow-2/">
+    <link rel="canonical" href="http://localhost:4000/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -163,12 +163,12 @@
                     <div class="tags">
                         
                     </div>
-                    <h1>结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）</h1>
+                    <h1>IRIS flowers识别（TensorFlow.contrib.learn）</h1>
                     
                     
                     <h2 class="subheading"></h2>
                     
-                    <span class="meta">Posted by Shenglei Sketches on November 10, 2016</span>
+                    <span class="meta">Posted by Shenglei Sketches on November 12, 2016</span>
                 </div>
             </div>
         </div>
@@ -186,246 +186,91 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-				<p>上一篇中的全连接神经网络上是不具有代码重用性的，这样零散的结构不太符合object-oriented规范。今天照着tutorial里给的代码重写了一遍，理解了其中的一些，还有一些依旧难以理解，可能是对python语法也不太熟悉的缘故。</p>
+				<p>官方教程的第四篇，识别IRIS flowers</p>
 
-<p>先把自己理解了的写下来，即使花费宝贵的半小时睡眠时间也得写下来，今日事今日毕！</p>
+<p><a href="https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/iris_flowers">iris代码</a></p>
 
-<p><a href="https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/naiveFNN.py">网络框架完整代码</a></p>
+<p>使用了tensorflow.contrib.learn中已经分装好的神经网络。</p>
 
-<p>神经网络框架的搭建在naiveFNN.py中完成，这里面没有任何数据，相当于定义了一个巨型函数，所有的数据都在后续使用中填充，而naiveFNN.py单纯地构建一个<strong>框架</strong>（或称为函数）</p>
-
-<blockquote>
-  <p>首先强调一点：TensorFlow中，图片的所有输入和输出shape都是[batch_size, NUM_nuerons]；输入[55000, 784]，输出[55000, 10]</p>
-</blockquote>
-
-<h4 id="inference---tensorflowgraph">inference 推理函数–用来构建出网络雏形（在tensorflow中把这个网络结构称为graph，图）：</h4>
-
-<p>这里我们构建一个4层的神经网络，输入层[784个nuerons]、隐藏层1（hidden1）、隐藏层2（hidden2）和输出层（softmax_linear）</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>def weights_varialble(shape, input_units):
-    initial = tf.truncated_normal(shape, stddev=1.0/math.sqrt(float(input_units)))
-    return tf.Variable(initial, name='weights')
-
-
-def biases_variable(shape):
-    initial = tf.zeros(shape)
-    return tf.Variable(initial, name='biases')
-    
-    
-def inference(images, hidden1_units, hidden2_units):
-    with tf.name_scope('hidden1'):
-        weights = weights_varialble([IMAGE_PIXELS, hidden1_units], IMAGE_PIXELS)
-        biases = biases_variable([hidden1_units])
-        hidden1 = tf.nn.relu(tf.matmul(images, weights) + biases)
-
-    with tf.name_scope('hidden2'):
-        weights = weights_varialble([hidden1_units, hidden2_units], hidden1_units)
-        biases = biases_variable([hidden2_units])
-        hidden2 = tf.nn.relu(tf.matmul(hidden1, weights) + biases)
-
-    with tf.name_scope('softmax_linear'):
-        weights = weights_varialble([hidden2_units, NUM_CLASSES], hidden2_units)
-        biases = biases_variable([NUM_CLASSES])
-        logits = tf.matmul(hidden2, weights) + biases
-
-    return logits
-</code></pre>
-</div>
-
-<p><strong>来看下这个函数的参数（args）：</strong></p>
-
-<p>images：输入的图片集–训练集、测试集……形状（shape）为[batch_size, IMAGE_PIXELS]，如[50, 784]</p>
-
-<p>hidden1_units, hidden2_units：这两层的neuron数量</p>
-
-<p><strong>我的额外理解：</strong></p>
-
-<ol>
-  <li>with tf.name_scope(‘hidden1’)：就是在名为hidden1的范围下定义了下面的这些东西：weights、biases和hidden1，所有的这些东西都是属于hidden1的。</li>
-  <li>这里weights和biases的初始化的函数不一定是这样的，如biases的初始化还可以用上一篇中的：<code class="highlighter-rouge">tf.constant(0.1, shape=shape)</code></li>
-  <li>还需要注意的，tensorflow中，matmul函数中参数的顺序，理论学习中我们知道应该是<code class="highlighter-rouge">y = Wx + b</code>，而这里matmul中的顺序是相反的–<code class="highlighter-rouge">matmul(x, W)</code>。其实我发现，tensorflow中矩阵的行列和理论学习中的都是相反的……</li>
-  <li>这里输出层softmax_linear没有使用调用softmax函数，是因为tensorflow中有这样的函数可以一边对数据apply softmax，一边进行计算交叉熵cross_entropy（简写xentropy），我们在下一步的loss函数中会用到的–sparse_softmax_cross_entropy_with_logits(…)</li>
-</ol>
-
-<p><strong>我的问题</strong></p>
-
-<p>name_scope中定义的变量可以在这个范围之外被读取到吗？如果说不能，那么上面代码中，<code class="highlighter-rouge">return logits</code>是怎么来的？如果说能，那么上面代码中，hidden1和hidden2中都有weights和biases这可怎么区分啊？？？</p>
-
-<h4 id="loss---">loss 损失函数–用来向雏形图中添加“损失操作”</h4>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>def loss(logits, labels):
-    labels = tf.to_int64(labels)
-    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, labels, name='xentropy')
-    loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
-    return loss
-</code></pre>
-</div>
-
-<p><strong>来看下这个函数的参数（args）：</strong></p>
-
-<p>logits：是我们在inference中构建好的网络雏形，或者说也是网络最后输出层的结果。我觉得这两种理解都行，更偏向于第一种理解，个人感觉这个和matlab中CNN搭建时候很像–建立一个雏形网络，要向里面加东西的时候，就把这个雏形网络作为参数传进去。</p>
-
-<p>labels：图片数据集的标签集，<code class="highlighter-rouge">shape = [batch_size, NUM_CLASSES]</code>。官网上说，这个集合必须是one-hot value，也就是说，如果这张图片中的数字是3，那么它的标签就得是[0, 0, 0, 1, 0, 0, 0, 0, 0, 0]。这里把labels传进来肯定是非常必要的，因为你要根据这个正确的labels来判断你的网络好不好，然后back propagation来调整你的weights和biases呀！</p>
-
-<p><strong>我的额外理解：</strong></p>
-
-<ol>
-  <li><code class="highlighter-rouge">loss = tf.reduce_mean(...)</code>，其实直接<code class="highlighter-rouge">loss = cross_entropy</code>也是没有啥关系的。只不过后面的learning rate调整得小一些就行啦，为什么呢？我是这样理解的：learning rate是每次梯度下降的步长，<strong>learning rate越小</strong>，梯度下降越慢，是一点儿一点，不敢懈怠地在下降，生动地说，就是<strong>学习得相当仔细</strong>。而我们的终极目标就是要减小loss到一个范围内，如果取均值，那么loss一开始就比较小了，于是learning rate可以相对大一些，也就是说学习得稍微粗略一些，也能在规定的时间（即迭代次数）内把loss减小到范围内；如果不取均值，那么loss一开始是比较大的，如果要在规定时间（即迭代次数）内把loss下降到一定的范围内，就要学习得仔细一点儿，即让learning rate相对小一些。个人理解，应该不太准确。</li>
-  <li>这里用了<code class="highlighter-rouge">tf.nn.sparse_softmax_cross_entropy_with_logits(...)</code>，用其他的也是可以的，比如说上一篇中用的<code class="highlighter-rouge">tf.nn.softmax_cross_entropy_with_logits(...)</code>。</li>
-</ol>
-
-<p><strong>我的问题</strong></p>
-
-<p>我看了半天也没有看出来官网给的代码中的labels怎么就突然成了one-hot value了，因为它的代码中并没有如下转换代码，而且数据本身也不是one-hot value啊。</p>
-
-<p>tutorials里面给了这段代码，可以让labels都变成one-hot value：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>batch_size = tf.size(labels)
-labels = tf.expand_dims(labels, 1)
-indices = tf.expand_dims(tf.range(0, batch_size, 1), 1)
-concated = tf.concat(1, [indices, labels])
-onehot_labels = tf.sparse_to_dense(concated, tf.pack([batch_size, NUM_CLASSES]), 1.0, 0.0)
-</code></pre>
-</div>
-
-<p>对tensorflow的tensor还不是很熟悉的我，真的很难想象tensor的dimension，我现在的唯一理解就是，第一维度就是最外层括号内有多少个整体（第二层括号或者数字），第二维度就是第二层括号内有几个整体（第三层括号或者数字），比如说[[],[],[],[]]的第一维度就是4，[[1,2,3],[3,2,1],[1,1,1],[2,2,2]]的第一维度是4，第二维度就是3。</p>
-
-<p>所以用代码把每一个步骤的结果打印出来。</p>
-
-<p>首先，假设<code class="highlighter-rouge">labels = [0, 3, 4, 1, 9]</code>，那么转换过程如下：</p>
+<p><strong>包的导入</strong></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>import tensorflow as tf
-session = tf.Session()
-
-NUM_CLASSES = 10
-
-labels = [0, 3, 4, 1, 9]
-print(labels)
-#输出结果：[0, 3, 4, 1, 9]
-
-batch_size = tf.size(labels)
-print(session.run(batch_size))
-#输出结果：5
-
-labels = tf.expand_dims(labels, 1)
-print(session.run(labels))
-#输出结果：
-[[0]
- [3]
- [4]
- [1]
- [9]]
-
-range = tf.range(0, batch_size, 1)
-print(session.run(range))
-#输出结果：[0 1 2 3 4]
-
-indices = tf.expand_dims(range, 1)
-print(session.run(indices))
-#输出结果：
-[[0]
- [1]
- [2]
- [3]
- [4]]
-
-concated = tf.concat(1, [indices, labels])
-print(session.run(concated))
-#输出结果：
-[[0 0]
- [1 3]
- [2 4]
- [3 1]
- [4 9]]
-
-pack = tf.pack([batch_size, NUM_CLASSES])
-print(session.run(pack))
-#输出结果：
-[ 5 10]
-
-onehot_labels = tf.sparse_to_dense(concated, pack, 1.0, 0.0)
-print(session.run(onehot_labels))
-#输出结果：
-[[1. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 1. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 0. 0. 1.]]
-
+import numpy as np
 </code></pre>
 </div>
+<p>import numpy：接下来有用到numpy中的数据类型。</p>
 
-<h4 id="training---">training 训练函数–用来向网络中（图中）添加“梯度下降”操作，故名“训练”</h4>
+<p><strong>下载数据</strong></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>def training(loss, learning_rate):
-    tf.scalar_summary(loss.op.name, loss)
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
-    global_step = tf.Variable(0, name='global_step', trainable=False)
-    train_op = optimizer.minimize(loss, global_step=global_step)
-    return train_op
+<p>把iris flowers的csv文件下载下来，这里把文件放在和神经网络同一文件夹下，所以路径直接是文件名称就可以了，不然的话就需要调整一下。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>IRIS_TRAINING = "iris_training.csv"
+IRIS_TEST = "iris_test.csv"
+
+training_set = tf.contrib.learn.datasets.base.load_csv_with_header(filename=IRIS_TRAINING, features_dtype=np.float, target_dtype=np.int)
+test_set = tf.contrib.learn.datasets.base.load_csv_with_header(filename=IRIS_TEST, features_dtype=np.float, target_dtype=np.int)
 </code></pre>
 </div>
-
-<p><strong>来看下这个函数的参数（args）：</strong></p>
-
-<p>loss：添加了“损失函数”的网络，或者是这个网络的损失值。</p>
-
-<p>learning_rate：学习率。说了这个函数是用梯度下降来训练网络的，所以学习率是必须的，也是人为规定的，所以作为参数输入。</p>
-
-<p><strong>我的额外理解：</strong></p>
-
-<ol>
-  <li>这里影响网络的是后面三行，第一行不影响，只是为了接下来的可视化做了一个监测。</li>
-  <li>optimizer.minimize更新了loss网络中的weights和biases，还更新了global_step（当前是第几次梯度下降）</li>
-</ol>
-
-<p><strong>我的问题</strong></p>
-
-<p>看不懂tf.scalar_summary的用法，说是这个可以把每一次的结果都实时地添加，然后就可以用TensorBoard来可视化整个过程了。还没仔细看过。</p>
-
-<h4 id="evaluation---inference">evaluation 评估函数–用来向<strong>inference</strong>函数构造的雏形网络中（图中）添加“评估函数”</h4>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>def evaluation(logits, labels):
-    correct = tf.nn.in_top_k(logits, labels, 1)
-    return tf.reduce_sum(tf.cast(correct, tf.int32))
-</code></pre>
-</div>
-
-<p><strong>来看下这个函数的参数（args）：</strong></p>
-
-<p>logits：是我们在inference中构建好的网络雏形，或者说也是网络最后输出层的结果。</p>
-
-<p>labels：图片数据集的标签集，是one-hot value，<code class="highlighter-rouge">shape = [batch_size, NUM_CLASSES]</code></p>
-
-<p><strong>我的额外理解：</strong></p>
-
-<ol>
-  <li><code class="highlighter-rouge">tf.nn.in_top_k(predictions, targets, k)</code>：predictions是<code class="highlighter-rouge">type = float32; shape = [batch_size, NUM_CLASSES]</code>的矩阵，其中的值代表这个图像被判定为该类别的概率，targets是<code class="highlighter-rouge">type = int32 or int64; shape = [batch_size]</code>的向量，其中的值代表这个图像的真实类别index。k表示这个图像的真实类别的值在predictions的概率中排名前k个。如果排到了前k个，则true，否则false。这里由于predictions全是one-hot value的，一个图像在10个类别下只有一个为1.0，其余都为0.0，所以k=1才能够分类（想一下如果k=2的话，概率的前两名就是1.0和0.0，不管这个类别是什么，它的概率肯定是1.0或者0.0的，也就是说，不论类别是啥，都会是对的。）</li>
-  <li>in_top_k函数的返回值是bool类型的，我们先把它转换成int类型的，也就是非1即0这样的，然后加一下总和，就知道有几个1了，也就是有几个正确的结果了。</li>
-  <li>redeuce_sum(…)的reduce意味着在这个tensor的第几个维度上操作。比如说，一个矩阵（Tensor’s rank = 2），指定<code class="highlighter-rouge">dim = 0</code>，则在第一维上求和，比如:</li>
-</ol>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>x = [[2, 3, 1], [2, 3, 1]]
-
-tf.reduce\_sum(x, 0)的结果就是：x = [[2, 3, 1]+[2, 3, 1]] = [4, 6, 2]
- 
-tf.reduce\_sum(x, 1)的结果就是：x = [[2+3+1], [2+3+1]] = [6, 6]
- 
-tf.reduce\_sum(x, -1) = tf.reduce\_sum(x, 0)
- 
-tf.reduce\_sum(x, -2) = tf.reduce\_sum(x, 1)
-</code></pre>
-</div>
-
-<p><strong>我的问题</strong></p>
-
-<p>这个没有啥问题……</p>
 
 <blockquote>
-  <p>下一篇中我们将填充数据，也就是官网代码中的fully_connected_feed.py中的代码</p>
+  <p>这里需要注意，官方的tutorials中有错误，tensorflow更新了，但是教程没有及时更新。
+官方tutorials中给的代码中使用的是<code class="highlighter-rouge">load_csv()</code>，但是在目前最新版本的tensorflow中已经把load_csv()给移除了，取而代之的是<code class="highlighter-rouge">load_csv_with_header(filename,
+                         target_dtype,
+                         features_dtype,
+                         target_column=-1)</code>和<code class="highlighter-rouge">load_csv_without_header(filename,
+                            target_dtype,
+                            features_dtype,
+                            target_column=-1)</code></p>
 </blockquote>
 
-<p>参考资料：<a href="https://www.tensorflow.org/versions/r0.11/tutorials/mnist/tf/index.html#tensorflow-mechanics-101">TensorFlow官方tutorial-mechanics-101</a></p>
+<blockquote>
+  <p>github上有这两个函数的<a href="https://github.com/tensorflow/tensorflow/blob/fcab4308002412e38c1a6d5c6145119f04540d45/tensorflow/contrib/learn/python/learn/datasets/base.py#L38">源代码</a>。</p>
+</blockquote>
+
+<p><strong>配置网络</strong></p>
+
+<p>tf.contrib.learn.DNNClassifier中已经把网络的框架封装完毕，只需要我们传入“特征配置”、“每一层节点数量”、“目标分类数”和”checkpoint data存放的路径“即可。</p>
+
+<p>特征配置：设定特征的数据类型-这里符合“real_valued_column”，然后一共有4个特征，所以dimension=4</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># 特征配置
+feature_columns = [tf.contrib.layers.real_valued_column("", dimension=4)]
+# 配置网络
+classifier = tf.contrib.learn.DNNClassifier(feature_columns=feature_columns, hidden_units=[10, 20, 10], n_classes=3, model_dir="/tmp/iris_model")
+</code></pre>
+</div>
+
+<p><strong>训练网络</strong></p>
+
+<p>直接调用fit函数即可，参数为训练数据、其对应的labels以及需要迭代的次数</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>classifier.fit(x=training_set.data, y=training_set.target, steps=2000)
+</code></pre>
+</div>
+
+<p><strong>评估网络</strong></p>
+
+<p>直接调用evaluate函数即可，参数为测试数据。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>accuracy_score = classifier.evaluate(x=test_set.data, y=test_set.target)["accuracy"]
+print('Accuracy: {0:f}'.format(accuracy_score))
+</code></pre>
+</div>
+
+<p>最终结果为：Accuracy: 0.966667</p>
+
+<p><strong>预测数据</strong></p>
+
+<p>用numpy.array模拟两个数据，然后调用predict函数预测模拟数据的labels</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>new_samples = np.array([[6.4, 3.2, 4.5, 1.5], [5.8, 3.1, 5.0, 1.7]], dtype=float)
+y = classifier.predict(new_samples)
+print('Predictions: {}'.format(str(y)))
+</code></pre>
+</div>
+<p>结果为：Predictions: [1 2]</p>
+
+<p>参考资料：<a href="https://www.tensorflow.org/versions/r0.11/tutorials/tflearn/index.html">TensorFlow官方tutorial-iris</a></p>
 
 
 
@@ -434,24 +279,17 @@ tf.reduce\_sum(x, -2) = tf.reduce\_sum(x, 1)
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/machine_learning/posts/2016/11/05/maching-learning-tensorflow-1/" data-toggle="tooltip" data-placement="top" title="使用TensorFlow搭建最简单的全连接神经网络">
-                        Previous<br>
-                        <span>使用TensorFlow搭建最简单的全连接神经网络</span>
-                        </a>
-                    </li>
-                    
-                    
-                    <li class="next">
                         <a href="/machine_learning/posts/2016/11/10/maching-learning-tensorflow-3/" data-toggle="tooltip" data-placement="top" title="结构化的全连接神经网络FNN框架--part2使用（TensorFlow）">
-                        Next<br>
+                        Previous<br>
                         <span>结构化的全连接神经网络FNN框架--part2使用（TensorFlow）</span>
                         </a>
                     </li>
                     
+                    
                 </ul>
 
                 <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/machine_learning/posts/2016/11/10/maching-learning-tensorflow-2" data-title="结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）" data-url="http://localhost:4000/machine_learning/posts/2016/11/10/maching-learning-tensorflow-2/"></div>
+                <div class="ds-thread" data-thread-key="/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4" data-title="IRIS flowers识别（TensorFlow.contrib.learn）" data-url="http://localhost:4000/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4/"></div>
                 <!-- 多说评论框 end -->
                 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
                 <script type="text/javascript">

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "使用TensorFlow搭建最简单的全连接神经网络"
-date:   2016-11-05 11:49:45 +0200
+date:   2016-11-05 11:49:45 +0800
 categories: machine_learning posts
 ---
 

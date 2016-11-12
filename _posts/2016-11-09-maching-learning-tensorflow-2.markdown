@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "结构化的全连接神经网络FNN框架--Part1搭建（TensorFlow）"
-date:   2016-11-09 22:15:50 +0200
+date:   2016-11-09 22:15:50 +0800
 categories: machine_learning posts
 ---
 
