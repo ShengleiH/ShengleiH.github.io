@@ -90,6 +90,12 @@ print('Predictions: {}'.format(str(y)))
 ```
 结果为：Predictions: [1 2]
 
-参考资料：[TensorFlow官方tutorial-iris][]
+参考资料：
+
+[TensorFlow官方tutorial-iris][]
+
+[StackOverFlow-load_csv][]
 
 [TensorFlow官方tutorial-iris]: https://www.tensorflow.org/versions/r0.11/tutorials/tflearn/index.html
+
+[StackOverFlow-load_csv][]: http://stackoverflow.com/questions/40007785/why-tensor-flow-could-not-load-csv
