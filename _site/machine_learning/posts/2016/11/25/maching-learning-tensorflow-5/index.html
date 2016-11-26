@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Shenglei, machine learing, cafe, sketches">
     <meta name="theme-color" content="#000000">
     
-    <title>IRIS flowers识别（TensorFlow.contrib.learn） - Shenglei | Sketches</title>
+    <title>TensorFlow卷积神经网络搭建（CIFAR10） - Shenglei | Sketches</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4/">
+    <link rel="canonical" href="http://localhost:4000/machine_learning/posts/2016/11/25/maching-learning-tensorflow-5/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -163,12 +163,12 @@
                     <div class="tags">
                         
                     </div>
-                    <h1>IRIS flowers识别（TensorFlow.contrib.learn）</h1>
+                    <h1>TensorFlow卷积神经网络搭建（CIFAR10）</h1>
                     
                     
                     <h2 class="subheading"></h2>
                     
-                    <span class="meta">Posted by Shenglei Sketches on November 12, 2016</span>
+                    <span class="meta">Posted by Shenglei Sketches on November 25, 2016</span>
                 </div>
             </div>
         </div>
@@ -186,95 +186,200 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-				<p>官方教程的第四篇，识别IRIS flowers</p>
+				<p>官方教程的CNN网络，识别CIFAR10数据集</p>
 
-<p><a href="https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/iris_flowers">iris代码</a></p>
+<p><a href="https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/cnn">cnn代码</a></p>
 
-<p>使用了tensorflow.contrib.learn中已经分装好的神经网络。</p>
+<p>这篇文章将使用“敏捷开发模型”来写……顾名思义，从最主要的部分“网络结构”开始写，然后自定义一些方法，如“数据的读取”，假设这些方法已经可用，最后再去补充这些方法。个人感觉，这样由主要到次要，慢慢补充才能捕获整个结构。最后的最后，再来看如何使用TensorBoard可视化整个过程，所以开始的代码中，省略了所有的summary。</p>
 
-<p><strong>包的导入</strong></p>
+<h3 id="cnn">CNN网络搭建</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>import tensorflow as tf
-import numpy as np
+<p><strong>CNN网络结构</strong></p>
+
+<p>输入的图像shape为 [batch_size, height, width, depth]</p>
+
+<p>第一层：卷积层 conv1</p>
+
+<p>第二层：池化层 pool1</p>
+
+<p>第三层：标准化层 norm1</p>
+
+<p>第四层：卷积层 conv2</p>
+
+<p>第五层：标准化层 norm2</p>
+
+<p>第六层：池化层 pool2</p>
+
+<p>第七层：全联接层 local1</p>
+
+<p>第八层：全联接层 local2</p>
+
+<p>第九层：输出层 softmax_linear</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>def inference(images_after_reshape):
+    # convolution layer 1
+    with tf.variable_scope('conv1') as conv1_scope:
+        kernel = _variable_with_weight_decay('weights', shape=[5,5,3,64], stddev=5e-2, wd=0.0)
+        conv = tf.nn.conv2d(images_after_reshape, kernel, strides=[1,1,1,1], padding='SAME')
+        biases = _variable_on_cpu('biases', shape=[64], initializer=tf.constant_initializer(0.0))
+        conv = tf.nn.bias_add(conv, bias=biases)
+        conv1 = tf.nn.relu(conv, name=conv1_scope.name)
+
+    # pooling layer
+    pool1 = tf.nn.max_pool(conv1, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME', name='pool1')
+
+    # normalization
+    norm1 = tf.nn.lrn(pool1, depth_radius=4, bias=1.0, alpha=0.001/9.0, beta=0.75, name='norm1')
+
+    # convolution layer 2
+    with tf.variable_scope('conv2') as conv2_scope:
+        kernel = _variable_with_weight_decay('weights', shape=[5,5,64,64], stddev=5e-2, wd=0.0)
+        conv = tf.nn.conv2d(norm1, kernel, strides=[1,1,1,1], padding='SAME')
+        biases = _variable_on_cpu('biases', shape=[64], initializer=tf.constant_initializer(0.1))
+        conv = tf.nn.bias_add(conv, bias=biases)
+        conv2 = tf.nn.relu(conv, name=conv2_scope.name)
+
+    # normalization
+    norm2 = tf.nn.lrn(conv2, depth_radius=4, bias=1.0, alpha=0.001/9.0, beta=0.75, name='norm2')
+
+    # pooling layer
+    pool2 = tf.nn.max_pool(norm2, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME', name='pool2')
+
+    # fully connected layer 1
+    with tf.variable_scope('local1') as local1_scope:
+        images_as_long_vector = tf.reshape(pool2, shape=[FLAGS.batch_size, -1])
+        input_neurons = images_as_long_vector.get_shape()[1].value
+        weights = _variable_with_weight_decay('weights', shape=[input_neurons, 384], stddev=0.04, wd=0.004)
+        biases = _variable_on_cpu('biases', shape=[384], initializer=tf.constant_initializer(0.1))
+        local1 = tf.nn.relu(tf.matmul(images_as_long_vector, weights) + biases, name=local1_scope.name)
+
+    # fully connected layer 2
+    with tf.variable_scope('local2') as local2_scope:
+        weights = _variable_with_weight_decay('weights', shape=[384, 192], stddev=0.04, wd=0.004)
+        biases = _variable_on_cpu('biases', shape=[192], initializer=tf.constant_initializer(0.1))
+        local1 = tf.nn.relu(tf.matmul(local1, weights) + biases, name=local2_scope.name)
+
+    # output layer - softmax layer
+    with tf.variable_scope('softmax_linear') as softmax_scope:
+        weights = _variable_with_weight_decay('weights', shape=[192, NUM_CLASSES], stddev=1/192.0, wd=0.0)
+        biases = _variable_on_cpu('biases', shape=[NUM_CLASSES], initializer=tf.constant_initializer(0.0))
+        softmax_linear = tf.add(tf.matmul(local1, weights) + biases, name=softmax_scope.name)
+
+    return softmax_linear
 </code></pre>
 </div>
-<p>import numpy：接下来有用到numpy中的数据类型。</p>
 
-<p><strong>下载数据</strong></p>
+<p>这里，有三个地方时我们自己假设的：</p>
 
-<p>把iris flowers的csv文件下载下来，这里把文件放在和神经网络同一文件夹下，所以路径直接是文件名称就可以了，不然的话就需要调整一下。</p>
+<ol>
+  <li>
+    <p>假设输入图像的形状已经是[batch_size, height, width, depth]。具体如何让自己的图像变成这样的形状，稍后会讲。</p>
+  </li>
+  <li>
+    <p>假设已经定义了<code class="highlighter-rouge">_variable_with_weight_decay(name, shape], stddev, wd)</code>函数，该函数将返回含有惩罚项（如L2, L1 loss）的权重。</p>
+  </li>
+  <li>
+    <p>假设已经定义了<code class="highlighter-rouge">_variable_on_cpu(name, shape, initializer)</code>函数，该函数将返回通过initializer获得的随机数。</p>
+  </li>
+</ol>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>IRIS_TRAINING = "iris_training.csv"
-IRIS_TEST = "iris_test.csv"
+<p><strong>CNN网络loss计算</strong></p>
 
-training_set = tf.contrib.learn.datasets.base.load_csv_with_header(filename=IRIS_TRAINING, features_dtype=np.float, target_dtype=np.int)
-test_set = tf.contrib.learn.datasets.base.load_csv_with_header(filename=IRIS_TEST, features_dtype=np.float, target_dtype=np.int)
+<p>为了调整权重，我们需要有一个loss function来评估网络的好坏。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>def loss(logits, labels):
+    labels = tf.cast(labels, tf.int64)
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels, name='cross_entropy_per_example')
+    cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
+    tf.add_to_collection('losses', cross_entropy_mean)
+    total_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
+    return total_loss
 </code></pre>
 </div>
 
-<blockquote>
-  <p>这里需要注意，官方的tutorials中有错误，tensorflow更新了，但是教程没有及时更新。
-官方tutorials中给的代码中使用的是<code class="highlighter-rouge">load_csv()</code>，但是在目前最新版本的tensorflow中已经把load_csv()给移除了，取而代之的是<code class="highlighter-rouge">load_csv_with_header(filename,
-                         target_dtype,
-                         features_dtype,
-                         target_column=-1)</code>和<code class="highlighter-rouge">load_csv_without_header(filename,
-                            target_dtype,
-                            features_dtype,
-                            target_column=-1)</code></p>
-</blockquote>
+<ol>
+  <li>
+    <p>logits：就是CNN网络，即inference()函数的返回值。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">tf.add_to_collection('losses', cross_entropy_mean)</code>：losses这个collection中除了有<code class="highlighter-rouge">cross_entropy_mean</code>，还有<code class="highlighter-rouge">weight_decay</code>这是在
+定义<code class="highlighter-rouge">_variable_with_weight_decay</code>时加进去的。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">tf.add_n</code>：就是把losses这个collection中的<code class="highlighter-rouge">cross_entropy_mean</code>和<code class="highlighter-rouge">weight_decay</code>取出来，然后相加，这样就形成了含有惩罚项(L2 or L1)的损失函数。</p>
+  </li>
+</ol>
 
-<blockquote>
-  <p>github上有这两个函数的<a href="https://github.com/tensorflow/tensorflow/blob/fcab4308002412e38c1a6d5c6145119f04540d45/tensorflow/contrib/learn/python/learn/datasets/base.py#L38">源代码</a>。</p>
-</blockquote>
+<p><strong>CNN网络权重调整–梯度下降</strong></p>
 
-<p><strong>配置网络</strong></p>
+<p>在定义了损失函数之后，我们将一边使用这个损失函数评估网络，一边使用梯度下降法(GD)来调整网络中的权重和偏置们。</p>
 
-<p>tf.contrib.learn.DNNClassifier中已经把网络的框架封装完毕，只需要我们传入“特征配置”、“每一层节点数量”、“目标分类数”和”checkpoint data存放的路径“即可。</p>
+<p>梯度下降法的使用，分为两步–1.每一个权重的梯度gradient；2.根据learning rate，使用梯度下降法调整权重。</p>
 
-<p>特征配置：设定特征的数据类型-这里符合“real_valued_column”，然后一共有4个特征，所以dimension=4</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>def train(total_loss, global_step):
+    # Variables that affect learning rate.
+    num_batches_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / FLAGS.batch_size
+    decay_steps = int(num_batches_per_epoch * NUM_EPOCHS_PER_DECAY)
 
-<div class="highlighter-rouge"><pre class="highlight"><code># 特征配置
-feature_columns = [tf.contrib.layers.real_valued_column("", dimension=4)]
-# 配置网络
-classifier = tf.contrib.learn.DNNClassifier(feature_columns=feature_columns, hidden_units=[10, 20, 10], n_classes=3, model_dir="/tmp/iris_model")
+    # Decay the learning rate exponentially based on the number of steps.
+    lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE, global_step, decay_steps, LEARNING_RATE_DECAY_FACTOR, staircase=True)
+
+    # Begin training
+    optimizer = tf.train.GradientDescentOptimizer(lr)
+    grads = optimizer.compute_gradients(total_loss)
+    train_op = optimizer.apply_gradients(grads, global_step=global_step)
+    return train_op
 </code></pre>
 </div>
 
-<p><strong>训练网络</strong></p>
+<p>这里由于我们不知道合适的learning rate是多少，所以我们动态地调整lr，画出曲线（如何画出曲线，稍后再说，这里把画曲线的代码省略了），然后最后选取最合适的lr。</p>
 
-<p>直接调用fit函数即可，参数为训练数据、其对应的labels以及需要迭代的次数</p>
+<h3 id="section">开始补充自定义方法</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>classifier.fit(x=training_set.data, y=training_set.target, steps=2000)
+<p><strong>初始化权重</strong></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>def _variable_with_weight_decay(name, shape, stddev, wd):
+    dtype = tf.float16 if FLAGS.use_fp16 else tf.float32
+    var = _variable_on_cpu(
+        name,
+        shape,
+        tf.truncated_normal_initializer(stddev=stddev, dtype=dtype))
+    if wd is not None:
+        weight_decay = tf.mul(tf.nn.l2_loss(var), wd, name='weight_loss')
+        tf.add_to_collection('losses', weight_decay)
+    return var
+
+
+def _variable_on_cpu(name, shape, initializer):
+    dtype = tf.float16 if FLAGS.use_fp16 else tf.float32
+    var = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer)
+    return var
 </code></pre>
 </div>
 
-<p><strong>评估网络</strong></p>
+<p>这两个自定义函数中，<code class="highlighter-rouge">_variable_on_cpu</code>很好理解，就是根据提供的initializer来随机生成一些数。</p>
 
-<p>直接调用evaluate函数即可，参数为测试数据。</p>
+<p><code class="highlighter-rouge">_variable_with_weight_decay</code>中主要是两个参数stddev和wd：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>accuracy_score = classifier.evaluate(x=test_set.data, y=test_set.target)["accuracy"]
-print('Accuracy: {0:f}'.format(accuracy_score))
-</code></pre>
-</div>
+<ol>
+  <li>
+    <p>stddev：因为这个函数中用的initializer是“截断高斯分布”，需要提供一个“标准差”来确定这个分布。</p>
+  </li>
+  <li>
+    <p>wd：weight_decay。这是惩罚项系数，就是乘在L2, L1 loss前面的那个系数。如果wd=0.0，就意味着，不要惩罚项。</p>
+  </li>
+  <li>
+    <p>可见，weights的初始化都用到了weight_dacay，而biases的初始化不需要weight_decay。</p>
+  </li>
+</ol>
 
-<p>最终结果为：Accuracy: 0.966667</p>
+<p><strong>图像数据的读取和reshape</strong></p>
 
-<p><strong>预测数据</strong></p>
-
-<p>用numpy.array模拟两个数据，然后调用predict函数预测模拟数据的labels</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>new_samples = np.array([[6.4, 3.2, 4.5, 1.5], [5.8, 3.1, 5.0, 1.7]], dtype=float)
-y = classifier.predict(new_samples)
-print('Predictions: {}'.format(str(y)))
-</code></pre>
-</div>
-<p>结果为：Predictions: [1 2]</p>
+<p>将在下一篇中讲到，因为比较复杂。</p>
 
 <p>参考资料：</p>
 
-<p><a href="https://www.tensorflow.org/versions/r0.11/tutorials/tflearn/index.html">TensorFlow官方tutorial-iris</a></p>
-
-<p><a href="http://stackoverflow.com/questions/40007785/why-tensor-flow-could-not-load-csv">StackOverFlow-load_csv</a></p>
+<p><a href="https://github.com/tensorflow/tensorflow/tree/r0.11/tensorflow/models/image/cifar10">TensorFlow官方tutorial-cnn-github</a></p>
 
 
 
@@ -283,24 +388,17 @@ print('Predictions: {}'.format(str(y)))
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/machine_learning/posts/2016/11/10/maching-learning-tensorflow-3/" data-toggle="tooltip" data-placement="top" title="结构化的全连接神经网络FNN框架--part2使用（TensorFlow）">
+                        <a href="/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4/" data-toggle="tooltip" data-placement="top" title="IRIS flowers识别（TensorFlow.contrib.learn）">
                         Previous<br>
-                        <span>结构化的全连接神经网络FNN框架--part2使用（TensorFlow）</span>
+                        <span>IRIS flowers识别（TensorFlow.contrib.learn）</span>
                         </a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/machine_learning/posts/2016/11/25/maching-learning-tensorflow-5/" data-toggle="tooltip" data-placement="top" title="TensorFlow卷积神经网络搭建（CIFAR10）">
-                        Next<br>
-                        <span>TensorFlow卷积神经网络搭建（CIFAR10）</span>
-                        </a>
-                    </li>
                     
                 </ul>
 
                 <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4" data-title="IRIS flowers识别（TensorFlow.contrib.learn）" data-url="http://localhost:4000/machine_learning/posts/2016/11/12/maching-learning-tensorflow-4/"></div>
+                <div class="ds-thread" data-thread-key="/machine_learning/posts/2016/11/25/maching-learning-tensorflow-5" data-title="TensorFlow卷积神经网络搭建（CIFAR10）" data-url="http://localhost:4000/machine_learning/posts/2016/11/25/maching-learning-tensorflow-5/"></div>
                 <!-- 多说评论框 end -->
                 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
                 <script type="text/javascript">
