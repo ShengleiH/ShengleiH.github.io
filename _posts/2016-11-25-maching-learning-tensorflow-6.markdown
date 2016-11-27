@@ -242,6 +242,8 @@ labels - batch_size个标签，shape为[batch_size]
 
 OK，至此为止，核心代码都讲过了，剩下的都是重复的或者很简单的，就不多说了。
 
+现在，整个CNN网络对我们来讲就是一个black box，我们不知道其中weights的更新情况，下一篇中，将学习一下使用TensorBoard如何进行可视化。
+
 [shuffle_batch运行原理]: http://m.2cto.com/kf/201611/561584.html
 
 [http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz]: http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz
