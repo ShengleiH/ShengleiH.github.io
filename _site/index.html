@@ -180,14 +180,15 @@
         <div class="post-content-preview">
             cnn中数据读取代码
 
+我认为最confusing的地方
+
 为什么tf.train.shuffle_batch()函数的参数中，只输入了单张图片，但是在训练的时候却能够获取到一个图片batch呢？
 
 在代码中可以看到是这样用的：
 
 images, label_batch = tf.train.shuffle_batch(
     [image, label],
-    batch_size=batch_size,
-    nu...
+    batch_size=...
         </div>
     </a>
     <p class="post-meta">
@@ -205,10 +206,9 @@ images, label_batch = tf.train.shuffle_batch(
         <div class="post-content-preview">
             官方教程的CNN网络，识别CIFAR10数据集
 
-cnn代码
+cifar10的cnn代码
 
-这篇文章将使用“敏捷开发模型”来写……顾名思义，从最主要的部分“网络结构”开始写，然后自定义一些方法，如“数据的读取”，假设这些方法已经可用，最后再去补充这些方法。个人感觉，这样由主要到次要，慢慢补充才能捕获整个结构。最后的最后，再来看如何使用TensorBoard可视化整个过程，所以开始的代码中，省略了所有的summary。
-...
+这篇文章将使用“敏捷开发模型”来写……顾名思义，从最主要的部分“网络结构”开始写，然后自定义一些方法，如“数据的读取”，假设这些方法已经可用，最后再去补充这些方法。个人感觉，这样由主要到次要，慢慢补充才能捕获整个结构。最后的最后，再来看如何使用TensorBoard可视化整个过程，所以开始的代码中，省略了所有的s...
         </div>
     </a>
     <p class="post-meta">

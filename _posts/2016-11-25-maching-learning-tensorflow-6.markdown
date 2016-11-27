@@ -39,7 +39,7 @@ images, label_batch = tf.train.shuffle_batch(
 
 接下来，一点儿点儿来分解和数据读取有关的代码。它们分布在cifar10\_input.py和cifar10\_model.py中。
 
-cifar10\_input.py是核心代码，cifar10\_model.py给了一个路径。
+cifar10\_model.py是路径指定和数据下载，cifar10\_input.py是数据读取和封装。
 
 **下载CIFAR-10数据**
 
@@ -98,7 +98,7 @@ tarfile.open(filepath, ‘r:gz’).extractall(data_dir)
 
 至此为止，不管用的是哪一种方法，都应该在你的工程下有如下目录结构：
 
-![目录结构图](../img/in-post/catelog_struc.png)
+![目录结构图]({{ site.baseurl }}/img/in-post/catelog_struc.png)
 
 **数据读取**
 
