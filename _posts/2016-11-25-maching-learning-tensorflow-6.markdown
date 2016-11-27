@@ -7,7 +7,7 @@ categories: machine_learning posts
 
 [cnn中数据读取代码][]
 
-[cnn中数据读取代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/cifar10／cifar10_input.py
+[cnn中数据读取代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/cifar10/cifar10_input.py
 
 ### 我认为最confusing的地方
  
