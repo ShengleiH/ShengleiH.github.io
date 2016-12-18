@@ -5,7 +5,7 @@ date:   2016-12-18 14:20:49 +0800
 categories: machine_learning posts
 ---
 
-[课程下载和PPT下载（密码：cas9）][]
+[课程下载和PPT下载（密码：i72q）][]
 
 前段时间一直在纠结到底应该看那个公开课来入门NLP，希望能够找到一个像Andrew Ng的machine learning一样的课程。先看了CS224d，打击了自信心，看到lecture3就没再看下去了。现在只能看得进Cousera那种一节一节的小课了。
 
