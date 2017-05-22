@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Machine Learning basis - Decision Tree 1"
-date:   2017-05-22 10:13:00 +0800
+date:   2017-05-22 12:36:00 +0800
 categories: machine_learning_basis posts
 ---
 
