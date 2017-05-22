@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "统计学习方法 - 决策树之特征选择"
-date:   2017-05-22 12:36:00 +0800
+date:   2017-05-22 19:01:00 +0800
 categories: machine_learning_basis posts
 ---
 
