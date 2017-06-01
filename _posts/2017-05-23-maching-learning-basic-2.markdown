@@ -41,7 +41,7 @@ for feature in features:
 
 例子如下，训练集：
 
-$\{x\mid x>5\}$
+$\left\{x\mid x>5\right\}$
 
 
 
