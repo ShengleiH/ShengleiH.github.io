@@ -50,13 +50,13 @@ for feature in features:
 
 $j=1$:
 
-$s=2.3$，划分{fefefe}成$R_1=\{ x \mid x^{j}\leq 2.3\}$以及$R_2=\{ x \mid x^{j}>  2.3 \}$，即$x_1, x_3, x_4$ 和$x_2$。得$c_1=\frac{y_1+y_3+y_4}{3}\approx3.83$，$c_2=\frac{y_4}{1}=9.0$，$square_{error1}=1.3689+3.3489+0.4489=5.1667$，$square_{error2}=0$，$error=5.1667$
+$s=2.3$，划分成$R_1=\{ x \mid x^{j}\leq 2.3\}$以及$R_2=\{ x \mid x^{j}>  2.3 \}$，即$x_1, x_3, x_4$ 和$x_2$。得$c_1=\frac{y_1+y_3+y_4}{3}\approx3.83$，$c_2=\frac{y_4}{1}=9.0$，$square_{error1}=1.3689+3.3489+0.4489=5.1667$，$square_{error2}=0$，$error=5.1667$
 
-$s=3.9$，划分成$R_1=\left \{ x \mid x^{j}\leq 3.9\right \}$以及$R_2=\left \{ x \mid x^{j}>  3.9\right \}$，即$ x_1, x_2, x_3, x_4$。得$c_1=\frac{y_1+y_2+y_3+y_4}{4}=5.125$，$c_2=0$，$square_{error1}=0.015625+15.015625+9.765625+0.390625=25.1875$，$square_{error2}=0$，$error=25.1875$
+$s=3.9$，划分成$R_1=\left\{ x \mid x^{j}\leq 3.9\right\}$以及$R_2=\left \{ x \mid x^{j}>  3.9\right \}$，即$ x_1, x_2, x_3, x_4$。得$c_1=\frac{y_1+y_2+y_3+y_4}{4}=5.125$，$c_2=0$，$square_{error1}=0.015625+15.015625+9.765625+0.390625=25.1875$，$square_{error2}=0$，$error=25.1875$
 
 $s=1.0$，划分成$R_1=\left \{ x \mid x^{j}\leq 1.0\right \}$以及$R_2=\left \{ x \mid x^{j}>  1.0\right \}$，即$ x_3$ 和$x_1, x_2,x_4$。得$c_1=\frac{y_3}{1}=2.0$，$c_2=\frac{y_1+y_2+y_4}{3}\approx6.17$，$square_{error1}=1.3689+8.0089+2.7889=12.1667$，$square_{error2}=0$，$error=12.1667$
 
-$s=1.2$，划分成$R_1=\left \{ x \mid x^{j}\leq 1.2\right \}$以及$R_2=\left \{ x \mid x^{j}>  1.2\right \}$，即$x_1, x_2$ 和$x_3, x_4$。得$c_1=\frac{y_2+y_1}{2}=7$，$c_2=\frac{y_3+y_4}{2}=3.25$，$square_{error1}=4+4=8$，$square_{error2}=1.5625+1.5625=3.125$，$error=11.125$
+$s=1.2​$，划分成$R_1=\left \{ x \mid x^{j}\leq 1.2\right \}​$以及$R_2=\left \{ x \mid x^{j}>  1.2\right \}​$，即$x_1, x_2​$ 和$x_3, x_4​$。得$c_1=\frac{y_2+y_1}{2}=7​$，$c_2=\frac{y_3+y_4}{2}=3.25​$，$square_{error1}=4+4=8​$，$square_{error2}=1.5625+1.5625=3.125​$，$error=11.125​$
 
 $j=2$:
 
