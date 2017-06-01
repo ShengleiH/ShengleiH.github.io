@@ -50,23 +50,23 @@ for feature in features:
 
 $j=1$:
 
-$s=2.3$，划分成$R_1=\{ x \mid x^{j}\leq 2.3\}$以及$R_2=\{ x \mid x^{j}>  2.3 \}$，即$x_1, x_3, x_4$ 和$x_2$。得$c_1=\frac{y_1+y_3+y_4}{3}\approx3.83$，$c_2=\frac{y_4}{1}=9.0$，$square_{error1}=1.3689+3.3489+0.4489=5.1667$，$square_{error2}=0$，$error=5.1667$
+$s=2.3$，划分成$R_1=$ {$ x \mid x^{j}\leq 2.3$}以及$R_2=$ {$ x \mid x^{j}>  2.3 $}，即$x_1, x_3, x_4$ 和$x_2$。得$c_1=\frac{y_1+y_3+y_4}{3}\approx3.83$，$c_2=\frac{y_4}{1}=9.0$，$square_{error1}=1.3689+3.3489+0.4489=5.1667$，$square_{error2}=0$，$error=5.1667$
 
-$s=3.9$，划分成$R_1=\left\{ x \mid x^{j}\leq 3.9\right\}$以及$R_2=\left \{ x \mid x^{j}>  3.9\right \}$，即$ x_1, x_2, x_3, x_4$。得$c_1=\frac{y_1+y_2+y_3+y_4}{4}=5.125$，$c_2=0$，$square_{error1}=0.015625+15.015625+9.765625+0.390625=25.1875$，$square_{error2}=0$，$error=25.1875$
+$s=3.9$，划分成$R_1=$ {$ x \mid x^{j}\leq 3.9$}以及$R_2=$ {$ x \mid x^{j}>  3.9$}，即$ x_1, x_2, x_3, x_4$。得$c_1=\frac{y_1+y_2+y_3+y_4}{4}=5.125$，$c_2=0$，$square_{error1}=0.015625+15.015625+9.765625+0.390625=25.1875$，$square_{error2}=0$，$error=25.1875$
 
-$s=1.0$，划分成$R_1=\left \{ x \mid x^{j}\leq 1.0\right \}$以及$R_2=\left \{ x \mid x^{j}>  1.0\right \}$，即$ x_3$ 和$x_1, x_2,x_4$。得$c_1=\frac{y_3}{1}=2.0$，$c_2=\frac{y_1+y_2+y_4}{3}\approx6.17$，$square_{error1}=1.3689+8.0089+2.7889=12.1667$，$square_{error2}=0$，$error=12.1667$
+$s=1.0$，划分成$R_1=$ {$ x \mid x^{j}\leq 1.0$}以及$R_2=$ {$ x \mid x^{j}> 1.0$}，即$ x_3$ 和$x_1, x_2,x_4$。得$c_1=\frac{y_3}{1}=2.0$，$c_2=\frac{y_1+y_2+y_4}{3}\approx6.17$，$square_{error1}=1.3689+8.0089+2.7889=12.1667$，$square_{error2}=0$，$error=12.1667$
 
-$s=1.2$，划分成$R_1=\left \{ x \mid x^{j}\leq 1.2\right \}$以及$R_2=\left \{ x \mid x^{j}>  1.2\right \}$，即$x_1, x_2$ 和$x_3, x_4$。得$c_1=\frac{y_2+y_1}{2}=7$，$c_2=\frac{y_3+y_4}{2}=3.25$，$square_{error1}=4+4=8$，$square_{error2}=1.5625+1.5625=3.125$，$error=11.125$
+$s=1.2$，划分成$R_1=$ {$ x \mid x^{j}\leq 1.2$}以及$R_2=$ {$ x \mid x^{j}>  1.2 $}，即$x_1, x_2$ 和$x_3, x_4$。得$c_1=\frac{y_2+y_1}{2}=7$，$c_2=\frac{y_3+y_4}{2}=3.25$，$square_{error1}=4+4=8$，$square_{error2}=1.5625+1.5625=3.125$，$error=11.125$
 
 $j=2$:
 
-$s=2.5$，划分成$R_1=\left \{ x \mid x^{j}\leq 2.5\right \}$以及$R_2=\left \{ x \mid x^{j}>  2.5\right \}$，即$x_1, x_3$ 和$x_2, x_4$。得$c_1=\frac{y_1+y_3}{2}=3.5$，$c_2=\frac{y_2+y_4}{2}=6.75$，$square_{error1}=2.25+2.25=4.5$，$square_{error2}=5.0625+5.0625=10.125$，$error=14.625$
+$s=2.5$，划分成$R_1=$ {$ x \mid x^{j}\leq 2.5$}以及$R_2=$ {$ x \mid x^{j}>  2.5$}，即$x_1, x_3$ 和$x_2, x_4$。得$c_1=\frac{y_1+y_3}{2}=3.5$，$c_2=\frac{y_2+y_4}{2}=6.75$，$square_{error1}=2.25+2.25=4.5$，$square_{error2}=5.0625+5.0625=10.125$，$error=14.625$
 
-$s=3.0$，划分成$R_1=\left \{ x \mid x^{j}\leq 3.0\right \}$以及$R_2=\left \{ x \mid x^{j}>  3.0\right \}$，即$x_1,x_2, x_3$ 和$ x_4$。得$c_1=\frac{y_1+y_2+y_3}{3}\approx5.3$，$c_2=\frac{y_4}{1}=4.5$，$square_{error1}=0.09+7.29+10.89=18.27$，$square_{error2}=0$，$error=18.27$
+$s=3.0$，划分成$R_1=$ {$ x \mid x^{j}\leq 3.0$}以及$R_2=$ {$ x \mid x^{j}>  3.0 $}，即$x_1,x_2, x_3$ 和$ x_4$。得$c_1=\frac{y_1+y_2+y_3}{3}\approx5.3$，$c_2=\frac{y_4}{1}=4.5$，$square_{error1}=0.09+7.29+10.89=18.27$，$square_{error2}=0$，$error=18.27$
 
-$s=1.3$，划分成$R_1=\left \{ x \mid x^{j}\leq 1.3\right \}$以及$R_2=\left \{ x \mid x^{j}>  1.3\right \}$，即$ x_3$ 和$x_1, x_2,x_4$。得$c_1=\frac{y_3}{1}=2.0$，$c_2=\frac{y_1+y_2+y_4}{3}\approx6.17$，$square_{error1}=0$，$square_{error2}=1.3689+8.0089+2.7789=12.1667$，$error=12.1667$
+$s=1.3$，划分成$R_1=$ {$ x \mid x^{j}\leq 1.3$}以及$R_2=$ {$ x \mid x^{j}>  1.3 $}，即$ x_3$ 和$x_1, x_2,x_4$。得$c_1=\frac{y_3}{1}=2.0$，$c_2=\frac{y_1+y_2+y_4}{3}\approx6.17$，$square_{error1}=0$，$square_{error2}=1.3689+8.0089+2.7789=12.1667$，$error=12.1667$
 
-$s=5.6$，划分成$R_1=\left \{ x \mid x^{j}\leq 5.6\right \}$以及$R_2=\left \{ x \mid x^{j}>  5.6\right \}$，即$ x_1, x_2, x_3, x_4$。得$c_1=\frac{y_1+y_2+y_3+y_4}{4}=5.125$，$c_2=0$，$square_{error1}=0.015625+15.015625+9.765625+0.390625=25.1875$，$square_{error2}=0$，$error=25.187$
+$s=5.6$，划分成$R_1=$ {$ x \mid x^{j}\leq 5.6$}以及$R_2=$ {$ x \mid x^{j}>  5.6$}，即$ x_1, x_2, x_3, x_4$。得$c_1=\frac{y_1+y_2+y_3+y_4}{4}=5.125$，$c_2=0$，$square_{error1}=0.015625+15.015625+9.765625+0.390625=25.1875$，$square_{error2}=0$，$error=25.187$
 
 于是当$j=1, s=2.3$时，划分得到的子集方差最小，所以划分成$x_1, x_3, x_4$ 和$x_2$。接着再对这两个子集分别重复以上方法进行划分即可，这里不再赘述。最终的停止条件人为设定，如误差的阈值等。
 
