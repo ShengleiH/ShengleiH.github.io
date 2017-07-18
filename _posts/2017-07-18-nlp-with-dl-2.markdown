@@ -1,0 +1,76 @@
+---
+layout: post
+title:  "NLP with Deep Learning - Lecture 2"
+date:   2017-07-18 22:30:00 +0800
+categories: natural language processing posts
+---
+
+本博客是学习斯坦福公开课"Natural Language Processing with Deep Learning"时的笔记。
+
+
+
+### Word2Vec - Skipgram
+
+
+
+由“中心词”预测周围上下文词的vector。每一个都有两个vector，一个代表周围词，一个代表中心词。
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_1.PNG)
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_2.PNG)
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_3.PNG)
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_4.PNG)
+
+
+
+以下是整个skipgram的详细过程：
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_5.PNG)
+
+
+
+以下是反向传播，求导过程。这里只有两个参数要求导，即两个举证W和W'，分别代表中心词和上下文词：
+
+
+
+对中心词矩阵W求导：
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_6.jpg)
+
+
+
+对上下文矩阵W'求导：
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_7.jpg)
+
+
+
+反向传播过程，权重（参数）的更新过程：
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_8.PNG)
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_9.PNG)
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_10.PNG)
