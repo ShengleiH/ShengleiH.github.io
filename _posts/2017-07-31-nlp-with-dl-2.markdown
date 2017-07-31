@@ -21,23 +21,17 @@ categories: natural language processing posts
 
    2.1. Skip-Gram
 
-   ​
-
    2.2. CBOW
 
 3. 两种优化方法
 
    3.1. Negative Sampling
 
-   ​
-
    3.2. Hierarchical Softmax
 
 4. 两种求导
 
    4.1. Naive Softmax bp
-
-   ​
 
    4.2. Negative Sampling bp
 
@@ -87,15 +81,15 @@ $U$是隐藏层到输出层的矩阵，又被称为word representation matrix（
 
 
 
-输入：一个中心词（center word，$x \in \mathbb{R}^{\left | W \right |\times 1}$）
+输入：一个中心词（center word，$x \in \mathbb{R}^{\mid W \mid \times 1}$）
 
 
 
-参数：一个look up table $V\in\mathbb{R}^{D_h\times\left |W \right |}$，一个word representation matrix $U\in\mathbb{R}^{\left |W  \right |\times D_h}$
+参数：一个look up table $V\in\mathbb{R}^{D_h\times\mid W \mid}$，一个word representation matrix $U\in\mathbb{R}^{\mid W \mid\times D_h}$
 
 
 
-输出：$T$个上下文词（context word，$\hat{y} \in \mathbb{R}^{\left |  W\right |\times 1}$）
+输出：$T$个上下文词（context word，$\hat{y} \in \mathbb{R}^{\mid W \mid\times 1}$）
 
 
 
@@ -111,11 +105,11 @@ v_c=Vx \in \mathbb{R}^{D_h\times1}
 $$
 
 $$
-z=u_o^Tv_c=Uv_c \in \mathbb{R}^{\left| W \right| \times 1}
+z=u_o^Tv_c=Uv_c \in \mathbb{R}^{\mid W \mid \times 1}
 $$
 
 $$
-\hat{y}=softmax(z) \in \mathbb{R}^{\left| W \right| \times 1}
+\hat{y}=softmax(z) \in \mathbb{R}^{\mid W \mid \times 1}
 $$
 
 $$
@@ -148,15 +142,15 @@ Skip-Gram步骤图：
 
 
 
-输入：$T$个上下文词（context word，$x\in \mathbb{R}^{\left |  W\right |\times 1}$）
+输入：$T$个上下文词（context word，$x\in \mathbb{R}^{\mid W \mid\times 1}$）
 
 
 
-参数：一个look up table $V\in\mathbb{R}^{D_h\times\left |W \right |}$，一个word representation matrix $U\in\mathbb{R}^{\left |W  \right |\times D_h}$
+参数：一个look up table $V\in\mathbb{R}^{D_h\times\mid W \mid}$，一个word representation matrix $U\in\mathbb{R}^{\left |W  \right |\times D_h}$
 
 
 
-输出：一个中心词（center word，$\hat{y} \in \mathbb{R}^{\left | W \right |\times 1}$）
+输出：一个中心词（center word，$\hat{y} \in \mathbb{R}^{\mid W \mid\times 1}$）
 
 
 
@@ -176,11 +170,11 @@ v_o=\sum^{T}_{t=1}v_{o_t}
 $$
 
 $$
-z=u_c^Tv_o=Uv_o \in \mathbb{R}^{\left| W \right| \times 1}
+z=u_c^Tv_o=Uv_o \in \mathbb{R}^{\mid W \mid \times 1}
 $$
 
 $$
-\hat{y}=softmax(z) \in \mathbb{R}^{\left| W \right| \times 1}
+\hat{y}=softmax(z) \in \mathbb{R}^{\mid W \mid \times 1}
 $$
 
 $$
