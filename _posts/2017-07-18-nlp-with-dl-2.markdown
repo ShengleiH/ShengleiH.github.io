@@ -5,72 +5,197 @@ date:   2017-07-18 22:30:00 +0800
 categories: natural language processing posts
 ---
 
-本博客是学习斯坦福公开课"Natural Language Processing with Deep Learning"时的笔记。
+本篇是学习斯坦福公开课"Natural Language Processing with Deep Learning"时的笔记。
 
 
 
-### Word2Vec - Skipgram
+包含leture2的内容。
+
+---
+
+### 目录
+
+1. Word2Vec的含义
+
+2. 两种实现方法
+
+   2.1. Skip-Gram
+
+   ​
+
+   2.2. CBOW
+
+3. 两种优化方法
+
+   3.1. Negative Sampling
+
+   ​
+
+   3.2. Hierarchical Softmax
+
+4. 两种求导
+
+   4.1. Naive Softmax bp
+
+   ​
+
+   4.2. Negative Sampling bp
+
+----
+
+### Word2Vec的含义
 
 
 
-由“中心词”预测周围上下文词的vector。每一个都有两个vector，一个代表周围词，一个代表中心词。
+一个单词，神经网络理解不了，需要人转换成数字再喂给它。最naive的方式就是one-hot，但是太过于稀疏，不好。所以在改进一下，把one-hot进一步压缩成一个dense vector。
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_1.PNG)
+word2vec算法就是根据上下文预测单词，从而获得词向量矩阵。
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_2.PNG)
+**预测单词的任务只是一个幌子，我们需要的结果并不是预测出来的单词，而是通过预测单词这个任务，不断更新着的参数矩阵weights。**
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_3.PNG)
+预测任务由一个简单的三层神经网络来完成，其中有两个参数矩阵$V$和$U$，$V\in\mathbb{R}^{D_h\times\left |W \right |}$，$U\in\mathbb{R}^{\left |W  \right |\times D_h}$。
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_4.PNG)
+$V$是输入层到隐藏层的矩阵，又被称为look-up table（因为，输入的是one-hot向量，一个one-hot向量乘以一个矩阵相当于取了这个矩阵的其中一列。将其中的每一列看成是词向量）
 
 
 
-以下是整个skipgram的详细过程：
+$U$是隐藏层到输出层的矩阵，又被称为word representation matrix（将其中的每一行看成是词向量）
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_5.PNG)
+**最后需要的词向量矩阵是将两个词向量矩阵相加 = $V+U^T$，然后每一列就是词向量。**
 
 
 
-以下是反向传播，求导过程。这里只有两个参数要求导，即两个举证W和W'，分别代表中心词和上下文词：
+### 两种实现方法
 
 
 
-对中心词矩阵W求导：
+#### Skip-Gram
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_6.jpg)
+**训练任务：根据中心词，预测出上下文词** 
 
 
 
-对上下文矩阵W'求导：
+输入：一个中心词（center word，$x \in \mathbb{R}^{\left | W \right |\times 1}$）
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_7.jpg)
+参数：一个look up table $V\in\mathbb{R}^{D_h\times\left |W \right |}$，一个word representation matrix $U\in\mathbb{R}^{\left |W  \right |\times D_h}$
 
 
 
-反向传播过程，权重（参数）的更新过程：
+输出：$T$个上下文词（context word，$\hat{y} \in \mathbb{R}^{\left |  W\right |\times 1}$）
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_8.PNG)
+损失函数：cross-entropy - $J(\theta) = \frac{1}{T}\sum^{T}_{t=1} y_t\log{\hat{y_t}}$
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_9.PNG)
+详细步骤：
+
+
+$$
+v_c=Vx \in \mathbb{R}^{D_h\times1}
+$$
+
+$$
+z=u_o^Tv_c=Uv_c \in \mathbb{R}^{\left| W \right| \times 1}
+$$
+
+$$
+\hat{y}=softmax(z) \in \mathbb{R}^{\left| W \right| \times 1}
+$$
+
+$$
+J(\theta) = \frac{1}{T}\sum^{T}_{t=1} y_t\log{\hat{y_t}}
+$$
+
+$$
+Warning: \hat{y_1}= \hat{y_2}=...= \hat{y_T}= \hat{y}, but: y_1 \neq y_2 \neq...\neq y_T
+$$
 
 
 
-![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_2_slice_10.PNG)
+Skip-Gram步骤图：
+
+
+
+![nlp_with_dl_2_slice_1]({{ site.baseurl }}/img/in-post/nlp_with_dl_lecture2/nlp_with_dl_2_slice_1.jpg)
+
+
+
+#### CBOW
+
+
+
+与Skip-Gram相反，是通过完成**上下文词预测中心词的任务**来训练词向量的。
+
+
+
+**训练任务：根据上下文词，预测出中心词**  
+
+
+
+输入：$T$个上下文词（context word，$x\in \mathbb{R}^{\left |  W\right |\times 1}$）
+
+
+
+参数：一个look up table $V\in\mathbb{R}^{D_h\times\left |W \right |}$，一个word representation matrix $U\in\mathbb{R}^{\left |W  \right |\times D_h}$
+
+
+
+输出：一个中心词（center word，$\hat{y} \in \mathbb{R}^{\left | W \right |\times 1}$）
+
+
+
+损失函数：cross-entropy - $J(\theta) = y\log{\hat{y}}$ 
+
+
+
+详细步骤：
+
+
+$$
+v_{o_t}=V \cdot x_t \in \mathbb{R}^{D_h\times1}
+$$
+
+$$
+v_o=\sum^{T}_{t=1}v_{o_t}
+$$
+
+$$
+z=u_c^Tv_o=Uv_o \in \mathbb{R}^{\left| W \right| \times 1}
+$$
+
+$$
+\hat{y}=softmax(z) \in \mathbb{R}^{\left| W \right| \times 1}
+$$
+
+$$
+J(\theta) = y\log{\hat{y}}
+$$
+
+
+
+CBOW步骤图：
+
+
+
+![nlp_with_dl_2_slice_2]({{ site.baseurl }}/img/in-post/nlp_with_dl_lecture2/nlp_with_dl_2_slice_2.jpg)
+
+
+
+未完待续......
+
