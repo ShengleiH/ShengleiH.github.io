@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "NLP with Deep Learning - Lecture 2"
-date:   2017-07-18 22:30:00 +0800
+date:   2017-07-31 09:10:00 +0800
 categories: natural language processing posts
 ---
 
