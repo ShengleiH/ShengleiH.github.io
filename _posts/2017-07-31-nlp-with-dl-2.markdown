@@ -53,7 +53,7 @@ word2vec算法就是根据上下文预测单词，从而获得词向量矩阵。
 
 
 
-预测任务由一个简单的三层神经网络来完成，其中有两个参数矩阵$V$和$U$，$V\in\mathbb{R}^{D_h\times\left |W \right |}$，$U\in\mathbb{R}^{\left |W  \right |\times D_h}$。
+预测任务由一个简单的三层神经网络来完成，其中有两个参数矩阵$V$和$U$，$V\in\mathbb{R}^{D_h\times\mid W \mid}$，$U\in\mathbb{R}^{\mid W \mid\times D_h}$。
 
 
 
