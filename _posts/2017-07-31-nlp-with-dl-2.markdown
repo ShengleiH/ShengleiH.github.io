@@ -146,7 +146,7 @@ Skip-Gram步骤图：
 
 
 
-参数：一个look up table $V\in\mathbb{R}^{D_h\times\mid W \mid}$，一个word representation matrix $U\in\mathbb{R}^{\left |W  \right |\times D_h}$
+参数：一个look up table $V\in\mathbb{R}^{D_h\times\mid W \mid}$，一个word representation matrix $U\in\mathbb{R}^{\mid W \mid\times D_h}$
 
 
 
