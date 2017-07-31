@@ -202,11 +202,13 @@ softmax(z)=\frac{z_i}{\sum^{\mid W \mid}_{j=1}z_j}
 $$
 
 
+
 代替的方法是“负采样”。即从一个特定分布中，随机取出$k$个words来代表整个corpus。$k$个words和中心词*(center word)*组成成为***noise pairs***，上下文词*(context words)*和中心词*(center word)*组合成为***true pairs***。
 
 
 
 这样一来，需要改变loss function为：
+
 
 
 $$
@@ -252,6 +254,7 @@ $$
 Forward如下，只考虑一对pair：
 
 
+
 $$
 v_c=Vx
 $$
@@ -268,6 +271,8 @@ $$
 J_t(\theta) =- y\log{\hat{y}}
 $$
 
+
+
 Back Propagate如下：
 
 
@@ -275,9 +280,11 @@ Back Propagate如下：
 定义几个reused项：
 
 
+
 $$
 \delta_1=\frac{\partial{J_t}}{\partial{z}}=\hat{y}-y
 $$
+
 
 
 这一项很好求，$softmax(z)=\frac{z_i}{\sum^{\mid W \mid}_{j=1}z_j}$，先求$\frac{\partial{J_t}}{\partial{z_i}}$，再求$\frac{\partial{J_t}}{\partial{z_j}} $  $(j \neq i)$，然后组合成$\frac{\partial{J_t}}{\partial{z}}$。
@@ -293,11 +300,14 @@ $$
 $$
 
 
+
 提示：可以先大概的写出链式求导的几个项，然后根据维度进行组合。
 
 
 
 接着对$V$进行求导：
+
+
 $$
 \frac{\partial{J_t}}{\partial{V}}=\frac{\partial{J_t}}{\partial{v_c}}=\frac{\partial{J_t}}{\partial{z}}\cdot\frac{\partial{z}}{\partial{v_c}}= U^T \cdot \delta_1
 $$
