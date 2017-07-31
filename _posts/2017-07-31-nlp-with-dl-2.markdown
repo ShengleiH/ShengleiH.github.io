@@ -210,23 +210,7 @@ $$
 
 
 $$
-J_t(\theta)=-\log\hat{y_{i}}-\sum^{K}_{k=1}\log\hat{y_{k_{i}}}
-$$
-
-
-下标$i$表示正确类别，即one-hot vector中1所在的位置。
-
-
-
-其中，使用$sigmoid()$将$z$转化成$\hat{y}$，同理$\hat{y_k}$：
-
-
-$$
-\hat{y_i}=sigmoid(z_i)=sigmoid(u_i^Tv_c)
-$$
-
-$$
-\hat{y_k}=sigmoid(z_k)=sigmoid(u_k^Tv_c)
+J_t(\theta)=-\log \sigma(u_o^Tv_c)-\sum^{K}_{k=1}\log\sigma(-u_k^Tv_c)
 $$
 
 
@@ -269,7 +253,7 @@ Forward如下，只考虑一对pair：
 
 
 $$
-v_c=Vx 
+v_c=Vx
 $$
 
 $$
@@ -330,4 +314,84 @@ $$
 
 
 
-待续......
+Forward如下，只考虑一对true pair：
+
+
+$$
+v_c=Vx
+$$
+
+$$
+z=Uv_c
+$$
+
+$$
+J_t(\theta)=-\log \sigma(u_o^Tv_c)-\sum^{K}_{k=1}\log\sigma(-u_k^Tv_c)
+$$
+
+
+
+Back Propagate如下：
+
+
+
+对$v_c$求导：
+
+
+
+
+$$
+\frac{\partial J_t(\theta)}{\partial v_c}=\frac{\partial J_t(\theta)}{\partial u_o^Tv_c} \cdot \frac{\partial u_o^Tv_c}{\partial v_c} + \sum^{K}_{k=1}\frac{\partial J_t(\theta)}{\partial -u_k^Tv_c} \cdot \frac{\partial -u_k^Tv_C}{\partial v_c} = (\sigma(u_o^Tv_c)-1)\cdot u_o-\sum^{K}_{k=1}(\sigma(-u_k^Tv_c)-1)u_k
+$$
+
+
+同理，对$u_o$求导：
+
+
+$$
+\frac{\partial J_t(\theta)}{\partial u_o}=(\sigma(u_o^Tv_c)-1)\cdot v_c
+$$
+
+
+同理，对$u_k$求导：
+
+
+$$
+\frac{\partial J_t(\theta)}{\partial u_k}=-(\sigma(-u_k^Tv_c)-1)\cdot v_c
+$$
+
+
+然后其余$u_{rest}$：
+
+
+$$
+\frac{\partial J_t(\theta)}{\partial u_{rest}}=0
+$$
+
+
+
+
+最后整理得：
+
+
+$$
+\frac{\partial J_t(\theta)}{\partial V}=\frac{\partial J_t(\theta)}{\partial v_c}
+$$
+
+$$
+\frac{\partial J_t(\theta)}{\partial U}=[\frac{\partial J_t(\theta)}{\partial u_o};\frac{\partial J_t(\theta)}{\partial u_k};\frac{\partial J_t(\theta)}{\partial u_{rest}}]
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
