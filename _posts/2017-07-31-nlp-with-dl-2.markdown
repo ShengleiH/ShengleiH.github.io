@@ -7,6 +7,8 @@ categories: natural language processing posts
 
 本篇是学习斯坦福公开课"Natural Language Processing with Deep Learning"时的笔记。
 
+
+
 包含leture2的内容。
 
 ---
@@ -92,6 +94,7 @@ $U$是隐藏层到输出层的矩阵，又被称为word representation matrix（
 详细步骤：
 
 
+
 $$
 v_c=Vx \in \mathbb{R}^{D_h\times1}
 $$
@@ -151,6 +154,7 @@ Skip-Gram步骤图：
 详细步骤：
 
 
+
 $$
 v_{o_t}=V \cdot x_t \in \mathbb{R}^{D_h\times1}
 $$
@@ -190,20 +194,33 @@ CBOW步骤图：
 
 
 原始的方法中使用$softmax()$将$z$转化成$\hat{y}$。很明显地，$softmax()$公式的分母将整个corpus都遍历了一遍，这个计算量并不小：
+
+
+
 $$
 softmax(z)=\frac{z_i}{\sum^{\mid W \mid}_{j=1}z_j}
 $$
+
+
 代替的方法是“负采样”。即从一个特定分布中，随机取出$k$个words来代表整个corpus。$k$个words和中心词*(center word)*组成成为***noise pairs***，上下文词*(context words)*和中心词*(center word)*组合成为***true pairs***。
 
 
 
 这样一来，需要改变loss function为：
+
+
 $$
 J_t(\theta)=-\log\hat{y_{i}}-\sum^{K}_{k=1}\log\hat{y_{k_{i}}}
 $$
+
+
 下标$i$表示正确类别，即one-hot vector中1所在的位置。
 
+
+
 其中，使用$sigmoid()$将$z$转化成$\hat{y}$，同理$\hat{y_k}$：
+
+
 $$
 \hat{y_i}=sigmoid(z_i)=sigmoid(u_i^Tv_c)
 $$
@@ -212,7 +229,11 @@ $$
 \hat{y_k}=sigmoid(z_k)=sigmoid(u_k^Tv_c)
 $$
 
+
+
 注：$u_i=U[i]$，即$U$中第$i$行。
+
+
 
 如果true pair出现的概率越大，noise pairs出现的概率越小，则这个loss会减小，满足loss的定义，所以可以把loss表示成如上公式。
 
@@ -245,6 +266,8 @@ $$
 
 
 Forward如下，只考虑一对pair：
+
+
 $$
 v_c=Vx 
 $$
@@ -263,10 +286,16 @@ $$
 
 Back Propagate如下：
 
+
+
 定义几个reused项：
+
+
 $$
 \delta_1=\frac{\partial{J_t}}{\partial{z}}=\hat{y}-y
 $$
+
+
 这一项很好求，$softmax(z)=\frac{z_i}{\sum^{\mid W \mid}_{j=1}z_j}$，先求$\frac{\partial{J_t}}{\partial{z_i}}$，再求$\frac{\partial{J_t}}{\partial{z_j}} $  $(j \neq i)$，然后组合成$\frac{\partial{J_t}}{\partial{z}}$。
 
 
@@ -274,9 +303,12 @@ $$
 然后对$U$进行求导：
 
 
+
 $$
 \frac{\partial{J_t}}{\partial{U}}=\frac{\partial{J_t}}{\partial{z}}\cdot\frac{\partial{z}}{\partial{U}}=\delta_1\cdot v_c^T
 $$
+
+
 提示：可以先大概的写出链式求导的几个项，然后根据维度进行组合。
 
 
@@ -285,6 +317,7 @@ $$
 $$
 \frac{\partial{J_t}}{\partial{V}}=\frac{\partial{J_t}}{\partial{v_c}}=\frac{\partial{J_t}}{\partial{z}}\cdot\frac{\partial{z}}{\partial{v_c}}= U^T \cdot \delta_1
 $$
+
 
 
 #### 4.2. Negative Sampling bp 
