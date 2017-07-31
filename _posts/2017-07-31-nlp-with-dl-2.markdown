@@ -7,8 +7,6 @@ categories: natural language processing posts
 
 本篇是学习斯坦福公开课"Natural Language Processing with Deep Learning"时的笔记。
 
-
-
 包含leture2的内容。
 
 ---
@@ -37,9 +35,7 @@ categories: natural language processing posts
 
 ----
 
-### Word2Vec的含义
-
-
+### 1. Word2Vec的含义
 
 一个单词，神经网络理解不了，需要人转换成数字再喂给它。最naive的方式就是one-hot，但是太过于稀疏，不好。所以在改进一下，把one-hot进一步压缩成一个dense vector。
 
@@ -69,13 +65,9 @@ $U$是隐藏层到输出层的矩阵，又被称为word representation matrix（
 
 
 
-### 两种实现方法
+### 2. 两种实现方法
 
-
-
-#### Skip-Gram
-
-
+#### 2.1. Skip-Gram
 
 **训练任务：根据中心词，预测出上下文词** 
 
@@ -93,7 +85,7 @@ $U$是隐藏层到输出层的矩阵，又被称为word representation matrix（
 
 
 
-损失函数：cross-entropy - $J(\theta) = \frac{1}{T}\sum^{T}_{t=1} y_t\log{\hat{y_t}}$
+损失函数：cross-entropy - $J_t(\theta) =  y\log{\hat{y}}$
 
 
 
@@ -105,7 +97,7 @@ v_c=Vx \in \mathbb{R}^{D_h\times1}
 $$
 
 $$
-z=u_o^Tv_c=Uv_c \in \mathbb{R}^{\mid W \mid \times 1}
+z=Uv_c \in \mathbb{R}^{\mid W \mid \times 1}
 $$
 
 $$
@@ -113,11 +105,11 @@ $$
 $$
 
 $$
-J(\theta) = \frac{1}{T}\sum^{T}_{t=1} y_t\log{\hat{y_t}}
+J_t(\theta)=y\log{\hat{y}}
 $$
 
 $$
-Warning: \hat{y_1}= \hat{y_2}=...= \hat{y_T}= \hat{y}, but: y_1 \neq y_2 \neq...\neq y_T
+J(\theta) = \frac{1}{T}\sum^{T}_{t=1} J_t(\theta)
 $$
 
 
@@ -130,9 +122,7 @@ Skip-Gram步骤图：
 
 
 
-#### CBOW
-
-
+#### 2.2. CBOW
 
 与Skip-Gram相反，是通过完成**上下文词预测中心词的任务**来训练词向量的。
 
@@ -154,7 +144,7 @@ Skip-Gram步骤图：
 
 
 
-损失函数：cross-entropy - $J(\theta) = y\log{\hat{y}}$ 
+损失函数：cross-entropy - $J_t(\theta) = y\log{\hat{y}}$ 
 
 
 
@@ -170,7 +160,7 @@ v_o=\sum^{T}_{t=1}v_{o_t}
 $$
 
 $$
-z=u_c^Tv_o=Uv_o \in \mathbb{R}^{\mid W \mid \times 1}
+z=Uv_o \in \mathbb{R}^{\mid W \mid \times 1}
 $$
 
 $$
@@ -178,7 +168,7 @@ $$
 $$
 
 $$
-J(\theta) = y\log{\hat{y}}
+J(\theta)=J_t(\theta) = y\log{\hat{y}}
 $$
 
 
@@ -191,5 +181,120 @@ CBOW步骤图：
 
 
 
-未完待续......
+### 3. 两种优化方法
 
+#### 3.1. Negative Sampling 
+
+以下内容基于Skip-Gram模型。CBOW同理。
+
+
+
+原始的方法中使用$softmax()$将$z$转化成$\hat{y}$。很明显地，$softmax()$公式的分母将整个corpus都遍历了一遍，这个计算量并不小：
+$$
+softmax(z)=\frac{z_i}{\sum^{\mid W \mid}_{j=1}z_j}
+$$
+代替的方法是“负采样”。即从一个特定分布中，随机取出$k$个words来代表整个corpus。$k$个words和中心词*(center word)*组成成为***noise pairs***，上下文词*(context words)*和中心词*(center word)*组合成为***true pairs***。
+
+
+
+这样一来，需要改变loss function为：
+$$
+J_t(\theta)=-\log\hat{y_{i}}-\sum^{K}_{k=1}\log\hat{y_{k_{i}}}
+$$
+下标$i$表示正确类别，即one-hot vector中1所在的位置。
+
+其中，使用$sigmoid()$将$z$转化成$\hat{y}$，同理$\hat{y_k}$：
+$$
+\hat{y_i}=sigmoid(z_i)=sigmoid(u_i^Tv_c)
+$$
+
+$$
+\hat{y_k}=sigmoid(z_k)=sigmoid(u_k^Tv_c)
+$$
+
+注：$u_i=U[i]$，即$U$中第$i$行。
+
+如果true pair出现的概率越大，noise pairs出现的概率越小，则这个loss会减小，满足loss的定义，所以可以把loss表示成如上公式。
+
+
+
+#### 3.2. Hierarchical Softmax 
+
+待续......
+
+
+
+### 4. 两种求导
+
+以下内容基于Skip-Gram模型。CBOW同理。
+
+
+
+模型要学习的是两个参数矩阵$V$和$U$。
+
+
+
+#### 4.1. Naive Softmax bp 
+
+首先，对$V$求梯度其实就是对$v_c$求梯度，因为在forward过程中，参与loss计算的只有$V$中第c列。所以，只对$v_c$求导即可。
+
+
+
+其次，对$U$求梯度，对$U$中每一个元素进行求导，因为在forward过程中，$U$中每一个元素参与loss计算(softmax中)。
+
+
+
+Forward如下，只考虑一对pair：
+$$
+v_c=Vx 
+$$
+
+$$
+z=Uv_c
+$$
+
+$$
+\hat{y}=softmax(z)
+$$
+
+$$
+J_t(\theta) =- y\log{\hat{y}}
+$$
+
+Back Propagate如下：
+
+定义几个reused项：
+$$
+\delta_1=\frac{\partial{J_t}}{\partial{z}}=\hat{y}-y
+$$
+这一项很好求，$softmax(z)=\frac{z_i}{\sum^{\mid W \mid}_{j=1}z_j}$，先求$\frac{\partial{J_t}}{\partial{z_i}}$，再求$\frac{\partial{J_t}}{\partial{z_j}} $  $(j \neq i)$，然后组合成$\frac{\partial{J_t}}{\partial{z}}$。
+
+
+
+然后对$U$进行求导：
+
+
+$$
+\frac{\partial{J_t}}{\partial{U}}=\frac{\partial{J_t}}{\partial{z}}\cdot\frac{\partial{z}}{\partial{U}}=\delta_1\cdot v_c^T
+$$
+提示：可以先大概的写出链式求导的几个项，然后根据维度进行组合。
+
+
+
+接着对$V$进行求导：
+$$
+\frac{\partial{J_t}}{\partial{V}}=\frac{\partial{J_t}}{\partial{v_c}}=\frac{\partial{J_t}}{\partial{z}}\cdot\frac{\partial{z}}{\partial{v_c}}= U^T \cdot \delta_1
+$$
+
+
+#### 4.2. Negative Sampling bp 
+
+首先，对$V$求梯度其实就是对$v_c$求梯度，因为在forward过程中，参与loss计算的只有$V$中第c列。所以，只对$v_c$求导即可。
+
+
+
+其次，对$U$求梯度，对$u_o$和$u_k$求梯度，因为在forward过程中，参与loss计算的只有$u_o$和$u_k$。
+
+
+
+待续......
