@@ -9,7 +9,7 @@ categories: machine_learning posts
 
 [3层全连接网络完整代码][]
 
-[3层全连接网络完整代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/naiveNN.py
+[3层全连接网络完整代码]: https://github.com/ShengleiH/tensorflow_tutorials/blob/master/tensorflow/tutorials/naiveNN.py
 
 
 #### 神经网络的搭建

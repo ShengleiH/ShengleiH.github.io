@@ -9,8 +9,8 @@ categories: machine_learning posts
 
 [使用FNN代码][]
 
-[使用FNN代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/fully_connected_feed.py
- 
+[使用FNN代码]: https://github.com/ShengleiH/tensorflow_tutorials/blob/master/tensorflow/tutorials/encapsulatedFNN/fully_connected_feed.py
+
 这里不进行整篇代码的详细解释，只对其中几个我疑惑的地方进行解释。
 
 #### 几个包的导入
@@ -65,7 +65,7 @@ FLAGS = flags.FLAGS
 ```
 local_file = base.maybe_download(TRAIN_IMAGES, train_dir, SOURCE_URL + TRAIN_IMAGES)
 ```
- 
+
 继续去base.maybe\_download(...)源代码查看：
 
 ```

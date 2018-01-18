@@ -7,10 +7,10 @@ categories: machine_learning posts
 
 [cnn中数据读取代码][]
 
-[cnn中数据读取代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/cifar10/cifar10_input.py
+[cnn中数据读取代码]: https://github.com/ShengleiH/tensorflow_tutorials/blob/master/tensorflow/tutorials/cifar10/cifar10_input.py
 
 ### 我认为最confusing的地方
- 
+
 为什么tf.train.shuffle_batch()函数的参数中，只输入了单张图片，但是在训练的时候却能够获取到一个图片batch呢？
 
 在代码中可以看到是这样用的：
@@ -191,19 +191,19 @@ depth_major = tf.reshape(tf.slice(record_bytes, [label_bytes], [image_bytes]), [
 
 这里可能会有疑惑，为什么是这样分离的呢？
 我们来看一下cifar-10官方网站上的说明就很明显了：
- 
+
 > The binary version contains the files data\_batch\_1.bin, data\_batch\_2.bin, ..., data\_batch\_5.bin, as well as test_batch.bin. Each of these files is formatted as follows:
-> 
+>
 > <1 x label><3072 x pixel>
-> 
+>
 > ...
-> 
+>
 > <1 x label><3072 x pixel>
-> 
+>
 > In other words, the first byte is the label of the first image, which is a number in the range 0-9. The next 3072 bytes are the values of the pixels of the image. The first 1024 bytes are the red channel values, the next 1024 the green, and the final 1024 the blue. The values are stored in row-major order, so the first 32 bytes are the red channel values of the first row of the image. 
- 
+
 所以，第一个数字就是label，后面的3072个数字，其实是这样组合的: 
- 
+
 [[red:1024], [green:1024], [blue:1024]] - 所以，reshape时候，第一维度是depth
 
 在看其中一个色度中：

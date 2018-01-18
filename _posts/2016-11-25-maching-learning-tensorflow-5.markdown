@@ -9,7 +9,7 @@ categories: machine_learning posts
 
 [cifar10的cnn代码][]
 
-[cifar10的cnn代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/cifar10/cifar10_model.py
+[cifar10的cnn代码]: https://github.com/ShengleiH/tensorflow_tutorials/blob/master/tensorflow/tutorials/cifar10/cifar10_model.py
 
 这篇文章将使用“敏捷开发模型”来写......顾名思义，从最主要的部分“网络结构”开始写，然后自定义一些方法，如“数据的读取”，假设这些方法已经可用，最后再去补充这些方法。个人感觉，这样由主要到次要，慢慢补充才能捕获整个结构。最后的最后，再来看如何使用TensorBoard可视化整个过程，所以开始的代码中，省略了所有的summary。
 
@@ -115,7 +115,7 @@ def loss(logits, labels):
 1. logits：就是CNN网络，即inference()函数的返回值。
 
 2. ```tf.add_to_collection('losses', cross_entropy_mean)```：losses这个collection中除了有```cross_entropy_mean```，还有```weight_decay```这是在
-定义```_variable_with_weight_decay```时加进去的。
+   定义```_variable_with_weight_decay```时加进去的。
 
 3. ```tf.add_n```：就是把losses这个collection中的```cross_entropy_mean```和```weight_decay```取出来，然后相加，这样就形成了含有惩罚项(L2 or L1)的损失函数。
 

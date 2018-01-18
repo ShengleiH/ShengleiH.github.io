@@ -11,8 +11,8 @@ categories: machine_learning posts
 
 [网络框架完整代码][]
 
-[网络框架完整代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/encapsulatedFNN/naiveFNN.py
- 
+[网络框架完整代码]: https://github.com/ShengleiH/tensorflow_tutorials/blob/master/tensorflow/tutorials/encapsulatedFNN/naiveFNN.py
+
 
 神经网络框架的搭建在naiveFNN.py中完成，这里面没有任何数据，相当于定义了一个巨型函数，所有的数据都在后续使用中填充，而naiveFNN.py单纯地构建一个**框架**（或称为函数）
 

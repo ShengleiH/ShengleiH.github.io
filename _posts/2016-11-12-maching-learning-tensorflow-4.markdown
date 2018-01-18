@@ -9,8 +9,8 @@ categories: machine_learning posts
 
 [iris代码][]
 
-[iris代码]: https://github.com/ShengleiH/machine_learning/blob/master/tensorflow/tutorials/iris_flowers
- 
+[iris代码]: https://github.com/ShengleiH/tensorflow_tutorials/blob/master/tensorflow/tutorials/iris_flowers
+
 使用了tensorflow.contrib.learn中已经分装好的神经网络。
 
 **包的导入**
